@@ -26,5 +26,5 @@ jobs:
       # Runs a single command using the runners shell
       - name: run the e2e test
         run: |
-        npm ci
-        npm run test:e2e
+          npm ci
+          npm run test:e2e
