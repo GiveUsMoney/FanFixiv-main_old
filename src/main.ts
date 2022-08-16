@@ -19,6 +19,7 @@ async function bootstrap() {
     }
 
     const config = _config.build();
+    config.openapi = '3.0.0';
     doc = SwaggerModule.createDocument(app, config);
   }
   SwaggerModule.setup('api', app, doc);
