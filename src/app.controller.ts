@@ -1,18 +1,26 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { TempData } from './interfaces/temp.interface';
+import { TempDataDto } from './dto/TempDataDto';
 
+@ApiTags('temp')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
+  @ApiOkResponse({
+    type: String,
+  })
   getHello(): string {
     return this.appService.getHello();
   }
 
   @Get('/temp')
-  getTemp(): TempData {
+  @ApiOkResponse({
+    type: TempDataDto,
+  })
+  getTemp(): TempDataDto {
     return this.appService.getTemp();
   }
 }
