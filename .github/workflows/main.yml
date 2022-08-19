@@ -42,7 +42,6 @@ jobs:
           npm ci
           npm run lint
           npm run format
-      - name: commit and push
       - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version.
         with:
           message: 'chore: format and linter'
