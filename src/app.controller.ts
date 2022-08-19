@@ -20,17 +20,7 @@ export class AppController {
   @ApiOkResponse({
     type: TempDataDto,
   })
-  getTemp(): TempDataDto 
-  
-  
-  
-  
-  
-  
-  
-  
-  {
-    var bar = true;
+  getTemp(): TempDataDto {
     return this.appService.getTemp();
   }
 }
