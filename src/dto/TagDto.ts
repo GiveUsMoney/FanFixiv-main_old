@@ -1,13 +1,13 @@
-import { IsEnum, IsString, IsOptional } from 'class-validator';
-import { Language } from 'src/interfaces/tag.interface';
+import { IsInt, IsString, IsOptional } from 'class-validator';
 
-export class TagLangDto {
+export class LimitDto {
   @IsOptional()
-  @IsEnum(Language, { each: true })
-  lang: Language = Language.KR;
+  @IsInt()
+  limit: number;
 }
-
-export class TagDto extends TagLangDto {
+export class TagDto extends LimitDto {
   @IsString()
   s: string;
+
+  limit = 5;
 }

@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Tag } from 'src/db/entities/tag.entity';
-import { TagLangDto } from 'src/dto/TagDto';
+import { LimitDto, TagDto } from 'src/dto/TagDto';
 import { TagService } from './tag.service';
 
 @ApiTags('tag')
@@ -13,8 +13,15 @@ export class TagController {
   @ApiOkResponse({
     type: [Tag],
   })
-  getAllTags(@Query() dto: TagLangDto): Promise<Tag[]> {
-    console.log(dto);
+  getAllTags(@Query() dto: LimitDto): Promise<Tag[]> {
     return this.tagService.findAll(dto);
+  }
+
+  @Get()
+  @ApiOkResponse({
+    type: [Tag],
+  })
+  getTagsByText(@Query() dto: TagDto): Promise<Tag[]> {
+    return this.tagService.find(dto);
   }
 }

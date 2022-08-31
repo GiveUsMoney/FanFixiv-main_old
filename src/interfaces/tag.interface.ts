@@ -1,24 +1,20 @@
 export interface ITag {
-  type: TagTypes;
+  type: string;
+  name: string;
   describe: string;
   using: boolean;
 }
 
-export interface ITagName {
-  name: string;
-  lang: Language;
-}
-
 export enum Language {
-  KR = 'korea',
-  JP = 'japan',
-  ENG = 'english',
+  KR = 'kr',
+  JP = 'jp',
+  ENG = 'eng',
 }
 
 export enum TagTypes {
-  ARTIST = 'artist',
-  series = 'series',
-  CHARACTOR = 'charactor',
-  ATTRIBUTE = 'attribute',
-  LANGUAGE = 'language',
+  ARTIST = '원작자',
+  SERIES = '시리즈',
+  CHARACTOR = '캐릭터',
+  ATTRIBUTE = '속성',
+  LANGUAGE = '언어',
 }

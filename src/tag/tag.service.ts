@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tag } from 'src/db/entities/tag.entity';
-import { TagLangDto } from 'src/dto/TagDto';
+import { LimitDto, TagDto } from 'src/dto/TagDto';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -11,12 +11,22 @@ export class TagService {
     private tagRepository: Repository<Tag>,
   ) {}
 
-  findAll(dto: TagLangDto): Promise<Tag[]> {
+  findAll(dto: LimitDto): Promise<Tag[]> {
     return this.tagRepository
       .createQueryBuilder('tag')
-      .leftJoinAndSelect('tag.names', 'names')
       .where('tag.using = true')
-      .andWhere('names.lang = :lang', { lang: dto.lang })
+      .limit(dto.limit)
+      .getMany();
+  }
+
+  find(dto: TagDto): Promise<Tag[]> {
+    return this.tagRepository
+      .createQueryBuilder('tag')
+      .where('tag.using = true')
+      .andWhere("concat(tag.type, ':', tag.name) ILIKE :search", {
+        search: '%' + dto.s + '%',
+      })
+      .limit(dto.limit)
       .getMany();
   }
 }
