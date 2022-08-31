@@ -1,31 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
-enum TagTypes {
-  ARTIST = 'artist',
-  series = 'series',
-  CHARACTOR = 'charactor',
-  ATTRIBUTE = 'attribute',
-  LANGUAGE = 'language',
-}
+import { Exclude } from 'class-transformer';
+import { ITag, TagTypes } from 'src/interfaces/tag.interface';
+import { Entity, Column, OneToMany } from 'typeorm';
+import { Base } from './base.entity';
+import { TagName } from './tag.names.entity';
 
 @Entity({ name: 'tb_tag' })
-export class Tag {
-  @PrimaryGeneratedColumn()
-  seq: number;
-
+export class Tag extends Base implements ITag {
   @Column({
     type: 'enum',
     enum: TagTypes,
     default: TagTypes.ATTRIBUTE,
   })
-  type: string;
-
-  @Column()
-  name: string;
+  type: TagTypes;
 
   @Column()
   describe: string;
 
+  @Exclude()
   @Column({ default: false })
   using: boolean;
+
+  @OneToMany(() => TagName, (tag) => tag.tag)
+  names!: TagName[];
 }
