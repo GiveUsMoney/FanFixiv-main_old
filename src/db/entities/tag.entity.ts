@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { ITag, TagTypes } from 'src/interfaces/tag.interface';
+import { ITag, TagTypes } from '@src/interfaces/tag.interface';
 import { Entity, Column } from 'typeorm';
 import { Base } from './base.entity';
 

@@ -11,7 +11,6 @@ import { TagModule } from './tag/tag.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
-      ignoreEnvFile: process.env.NODE_ENV === 'test',
     }),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,

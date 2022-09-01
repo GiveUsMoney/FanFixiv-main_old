@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { Tag } from 'src/db/entities/tag.entity';
-import { LimitDto, TagDto } from 'src/dto/TagDto';
+import { Tag } from '@src/db/entities/tag.entity';
+import { LimitDto, TagDto } from '@src/dto/TagDto';
 import { TagService } from './tag.service';
 
 @ApiTags('tag')
