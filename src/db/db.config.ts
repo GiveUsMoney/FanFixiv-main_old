@@ -15,7 +15,7 @@ class TypeOrmConfigService implements TypeOrmOptionsFactory {
       password: this.configService.get('DB_PW'),
       database: this.configService.get('DB_NAME'),
       synchronize: true,
-      logging: true,
+      logging: process.env.NODE_ENV === 'dev',
       entities: ['dist/**/*.entity.{ts,js}'],
     };
   }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TempData } from './interfaces/temp.interface';
+import { ITempData } from './interfaces/temp.interface';
 
 @Injectable()
 export class AppService {
@@ -9,7 +9,7 @@ export class AppService {
     return 'Hello World!';
   }
 
-  getTemp(): TempData {
+  getTemp(): ITempData {
     return {
       id: this.ID++,
       content: 'Hello World!',
