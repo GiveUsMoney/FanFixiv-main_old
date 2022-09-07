@@ -1,5 +1,5 @@
 export interface ITag {
-  type: string;
+  type: TagTypes;
   name: string;
   describe: string;
   using: boolean;
