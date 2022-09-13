@@ -1,6 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { Tag } from '@src/db/entities/tag.entity';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   LimitDto,
   TagDescribeDto,
@@ -9,14 +8,23 @@ import {
 } from '@src/dto/TagDto';
 import { TagService } from './tag.service';
 
+/**
+ * 태그 컨트롤러
+ *
+ * - GET /tag
+ * - GET /tag/all
+ */
 @ApiTags('tag')
 @Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @Get('all')
+  @ApiQuery({
+    type: LimitDto,
+  })
   @ApiOkResponse({
-    type: [Tag],
+    type: [TagDescribeDto],
   })
   async getAllTags(@Query() dto: LimitDto): Promise<TagDescribeDto[]> {
     const items = await this.tagService.findAll(dto);
@@ -24,8 +32,11 @@ export class TagController {
   }
 
   @Get()
+  @ApiQuery({
+    type: TagDto,
+  })
   @ApiOkResponse({
-    type: [Tag],
+    type: [TagResultDto],
   })
   async getTagsByText(@Query() dto: TagDto): Promise<TagResultDto[]> {
     const items = await this.tagService.find(dto);

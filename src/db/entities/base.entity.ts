@@ -5,6 +5,9 @@ import {
   BaseEntity,
 } from 'typeorm';
 
+/**
+ * 모든 Entity는 해당 Base Class를 상속
+ */
 export class Base extends BaseEntity {
   @PrimaryGeneratedColumn()
   seq: number;
