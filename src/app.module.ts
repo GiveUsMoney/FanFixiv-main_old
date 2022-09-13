@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ContentModule } from './content/content.module';
 import { TypeOrmConfigService } from './db/db.config';
 import { TagModule } from './tag/tag.module';
 
@@ -16,6 +17,7 @@ import { TagModule } from './tag/tag.module';
       useClass: TypeOrmConfigService,
     }),
     TagModule,
+    ContentModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,0 +1,30 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Content } from '@src/db/entities/content.entity';
+import { ContentDto } from '@src/dto/ContentDto';
+import { Repository } from 'typeorm';
+
+@Injectable()
+export class ContentService {
+  constructor(
+    @InjectRepository(Content)
+    private contentRepository: Repository<Content>,
+  ) {}
+
+  getContentCount(): Promise<number> {
+    return this.contentRepository.count();
+  }
+
+  getContent(dto: ContentDto): Promise<Content[]> {
+    const { count, page } = dto;
+    const skip = count * (page - 1);
+    return this.contentRepository.find({
+      relations: ['tags'],
+      order: {
+        seq: 'ASC',
+      },
+      take: count,
+      skip,
+    });
+  }
+}

@@ -1,7 +1,12 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Tag } from '@src/db/entities/tag.entity';
-import { LimitDto, TagDto } from '@src/dto/TagDto';
+import {
+  LimitDto,
+  TagDescribeDto,
+  TagDto,
+  TagResultDto,
+} from '@src/dto/TagDto';
 import { TagService } from './tag.service';
 
 @ApiTags('tag')
@@ -13,15 +18,17 @@ export class TagController {
   @ApiOkResponse({
     type: [Tag],
   })
-  getAllTags(@Query() dto: LimitDto): Promise<Tag[]> {
-    return this.tagService.findAll(dto);
+  async getAllTags(@Query() dto: LimitDto): Promise<TagDescribeDto[]> {
+    const items = await this.tagService.findAll(dto);
+    return items.map((item) => new TagDescribeDto(item));
   }
 
   @Get()
   @ApiOkResponse({
     type: [Tag],
   })
-  getTagsByText(@Query() dto: TagDto): Promise<Tag[]> {
-    return this.tagService.find(dto);
+  async getTagsByText(@Query() dto: TagDto): Promise<TagResultDto[]> {
+    const items = await this.tagService.find(dto);
+    return items.map((item) => new TagResultDto(item));
   }
 }
