@@ -11,10 +11,15 @@ export class ContentService {
     private contentRepository: Repository<Content>,
   ) {}
 
+  /** @return 컨텐츠 개수 */
   getContentCount(): Promise<number> {
     return this.contentRepository.count();
   }
 
+  /**
+   * @param dto 컨텐츠 DTO
+   * @return 컨텐츠 목록
+   */
   getContent(dto: ContentDto): Promise<Content[]> {
     const { count, page } = dto;
     const skip = count * (page - 1);

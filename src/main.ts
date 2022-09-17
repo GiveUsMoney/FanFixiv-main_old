@@ -8,6 +8,7 @@ async function bootstrap() {
 
   let doc: OpenAPIObject;
 
+  // NODE_ENV가 dev일때만 Swagger를 표시합니다
   if (process.env.NODE_ENV === 'dev') {
     const _config = new DocumentBuilder()
       .setTitle('FanFixiv 업로드 Swagger')
@@ -15,6 +16,7 @@ async function bootstrap() {
       .setVersion('1.0')
       .addTag('temp');
 
+    // 개발 서버에 배포된 경우 /upload path를 추가합니다
     if (process.env.DEV_SERVER) {
       _config.addServer('/upload');
     }
@@ -23,8 +25,10 @@ async function bootstrap() {
     config.openapi = '3.0.0';
     doc = SwaggerModule.createDocument(app, config);
   }
+  // /api path에 swagger를 표시합니다.
   SwaggerModule.setup('api', app, doc);
 
+  // 전역 class-validator 검사 파이프 사용 (후일 커스텀 파이프로 교체 예정)
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   await app.listen(3000);
