@@ -3,6 +3,7 @@ export interface ITag {
   name: string;
   description: string;
   status: boolean;
+  isAdult: boolean;
 }
 
 export enum Language {

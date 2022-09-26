@@ -52,6 +52,8 @@ export class TagResultDto implements ITag {
   description: string;
 
   status: boolean;
+
+  isAdult: boolean;
 }
 
 @Exclude()
@@ -73,4 +75,6 @@ export class TagDescriptionDto extends TagResultDto implements ITag {
   description: string;
 
   status: boolean;
+
+  isAdult: boolean;
 }

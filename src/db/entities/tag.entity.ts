@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
 import { ITag, TagTypes } from '@src/interfaces/tag.interface';
 import { Entity, Column } from 'typeorm';
@@ -22,10 +21,13 @@ export class Tag extends Base implements ITag {
   @IsString()
   description: string;
 
-  @Exclude()
   @IsBoolean()
   @Column({ default: false })
   status: boolean;
+
+  @IsBoolean()
+  @Column({ default: false })
+  isAdult: boolean;
 }
 
 @Entity({ name: 'tb_type_name' })
