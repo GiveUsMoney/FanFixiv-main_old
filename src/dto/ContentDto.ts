@@ -61,7 +61,7 @@ export class ContentCardDto implements IContent {
   })
   like: number;
 
-  translate_review: string;
+  translateReview: string;
 
   @Expose()
   @ApiProperty({

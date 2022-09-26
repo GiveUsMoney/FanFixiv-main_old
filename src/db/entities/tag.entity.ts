@@ -20,10 +20,23 @@ export class Tag extends Base implements ITag {
 
   @Column()
   @IsString()
-  describe: string;
+  description: string;
 
   @Exclude()
   @IsBoolean()
   @Column({ default: false })
-  using: boolean;
+  status: boolean;
+}
+
+@Entity({ name: 'tb_type_name' })
+export class TagName extends Base {
+  @Column({
+    name: 'type_seq',
+  })
+  @IsString()
+  typeSeq: string;
+
+  @Column({ name: 'type_name' })
+  @IsString()
+  typeName: string;
 }
