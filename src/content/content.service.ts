@@ -18,6 +18,8 @@ export class ContentService {
 
   /**
    * @param dto 컨텐츠 DTO
+   * @param dto.count 출력할 컨텐츠 수
+   * @param dto.page 표시할 페이지 번호
    * @return 컨텐츠 목록
    */
   getContent(dto: ContentDto): Promise<Content[]> {

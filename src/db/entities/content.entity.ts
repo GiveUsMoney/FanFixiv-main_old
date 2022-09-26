@@ -16,12 +16,14 @@ export class Content extends Base implements IContent {
 
   @Column()
   @IsString()
-  translate_review: string;
+  translateReview: string;
 
   // 후일 User테이블이 추가된 후 변경할 예정입니다.
   like: number;
 
   @ManyToMany(() => Tag)
-  @JoinTable()
+  @JoinTable({
+    name: 'tb_content_tag_reg',
+  })
   tags: Tag[];
 }

@@ -1,8 +1,8 @@
 export interface ITag {
   type: TagTypes;
   name: string;
-  describe: string;
-  using: boolean;
+  description: string;
+  status: boolean;
 }
 
 export enum Language {
@@ -12,9 +12,9 @@ export enum Language {
 }
 
 export enum TagTypes {
-  ARTIST = '원작자',
-  SERIES = '시리즈',
-  CHARACTOR = '캐릭터',
-  ATTRIBUTE = '속성',
-  LANGUAGE = '언어',
+  ARTIST,
+  SERIES,
+  CHARACTOR,
+  ATTRIBUTE,
+  LANGUAGE,
 }

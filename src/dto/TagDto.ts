@@ -37,7 +37,6 @@ export class TagResultDto implements ITag {
   @Expose()
   @IsEnum(TagTypes)
   @ApiProperty({
-    enum: ['원작자', '시리즈', '캐릭터', '속성', '언어'],
     description: '태그 종류',
   })
   type: TagTypes;
@@ -50,13 +49,13 @@ export class TagResultDto implements ITag {
   })
   name: string;
 
-  describe: string;
+  description: string;
 
-  using: boolean;
+  status: boolean;
 }
 
 @Exclude()
-export class TagDescribeDto extends TagResultDto implements ITag {
+export class TagDescriptionDto extends TagResultDto implements ITag {
   @Expose()
   @IsEnum(TagTypes)
   type: TagTypes;
@@ -71,7 +70,7 @@ export class TagDescribeDto extends TagResultDto implements ITag {
     type: String,
     description: '태그 설명',
   })
-  describe: string;
+  description: string;
 
-  using: boolean;
+  status: boolean;
 }
