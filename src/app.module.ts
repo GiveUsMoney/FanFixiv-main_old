@@ -4,11 +4,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthGuard } from './common/guard/auth.guard';
 import { ContentModule } from './content/content.module';
 import { TypeOrmConfigService } from './config/db.config';
 import { TagModule } from './tag/tag.module';
 import { JwtConfigService } from './config/jwt.config';
+import { JwtStrategy } from './common/strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -35,14 +35,12 @@ import { JwtConfigService } from './config/jwt.config';
   providers: [
     // 후일 삭제 바람.
     AppService,
+    //JWT 설정
+    JwtStrategy,
     // 전역 직렬화 인터셉터 추가. (후일 전역이 아닌 다른 방식으로 교체 예정)
     {
       provide: 'APP_INTERCEPTOR',
       useClass: ClassSerializerInterceptor,
-    },
-    {
-      provide: 'APP_GUARD',
-      useClass: AuthGuard,
     },
   ],
 })
