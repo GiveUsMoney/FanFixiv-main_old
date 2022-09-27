@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Content } from '@src/db/entities/content.entity';
+import { Content } from '@src/entities/content.entity';
 import { IContent } from '@src/interfaces/content.interface';
 import { Exclude, Expose, plainToClass, Transform } from 'class-transformer';
 import { IsInt, Min } from 'class-validator';
