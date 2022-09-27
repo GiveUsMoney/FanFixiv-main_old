@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Tag } from '@src/db/entities/tag.entity';
+import { Tag } from '@src/entities/tag.entity';
 import { ITag, TagTypes } from '@src/interfaces/tag.interface';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsInt, IsString, IsOptional, IsEnum } from 'class-validator';

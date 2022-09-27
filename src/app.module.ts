@@ -4,8 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ContentModule } from './content/content.module';
-import { TypeOrmConfigService } from './db/db.config';
+import { TypeOrmConfigService } from './config/db.config';
 import { TagModule } from './tag/tag.module';
+import { JwtStrategy } from './common/strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -15,8 +16,8 @@ import { TagModule } from './tag/tag.module';
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     // TypeOrm 모듈 사용
+    // 모든 Config는 TypeOrmConfigService에 존재.
     TypeOrmModule.forRootAsync({
-      // 모든 Config는 TypeOrmConfigService에 존재.
       useClass: TypeOrmConfigService,
     }),
     // 이하는 API 모듈 일람
@@ -28,6 +29,8 @@ import { TagModule } from './tag/tag.module';
   providers: [
     // 후일 삭제 바람.
     AppService,
+    //JWT 설정
+    JwtStrategy,
     // 전역 직렬화 인터셉터 추가. (후일 전역이 아닌 다른 방식으로 교체 예정)
     {
       provide: 'APP_INTERCEPTOR',
