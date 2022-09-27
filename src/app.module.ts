@@ -1,13 +1,11 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ContentModule } from './content/content.module';
 import { TypeOrmConfigService } from './config/db.config';
 import { TagModule } from './tag/tag.module';
-import { JwtConfigService } from './config/jwt.config';
 import { JwtStrategy } from './common/strategy/jwt.strategy';
 
 @Module({
@@ -21,10 +19,6 @@ import { JwtStrategy } from './common/strategy/jwt.strategy';
     // 모든 Config는 TypeOrmConfigService에 존재.
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
-    }),
-    // JWT
-    JwtModule.registerAsync({
-      useClass: JwtConfigService,
     }),
     // 이하는 API 모듈 일람
     TagModule,
