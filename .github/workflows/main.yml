@@ -40,6 +40,11 @@ jobs:
           npm run test:e2e
         env:
           secret: ${{ secrets.SECRET }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PW: ${{ secrets.DB_PW }}
+          DB_NAME: ${{ secrets.DB_NAME }}
 
   lint:
     # The type of runner that the job will run on
