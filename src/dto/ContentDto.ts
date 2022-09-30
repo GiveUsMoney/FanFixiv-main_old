@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Content } from '@src/entities/content.entity';
 import { IContent } from '@src/interfaces/content.interface';
-import { Exclude, Expose, plainToClass, Transform } from 'class-transformer';
-import { IsInt, Min } from 'class-validator';
+import { Exclude, Expose, plainToInstance, Transform } from 'class-transformer';
+import { IsInt, Min } from '@src/common/validator';
 import { TagResultDto } from './TagDto';
 
 export class ContentDto {
   @IsInt()
+  @Min(1)
   @Transform((x) => parseInt(x.value))
   @ApiProperty({
     description: '컨텐츠 카드 개수',
@@ -30,7 +31,7 @@ export class ContentDto {
 export class ContentCardDto implements IContent {
   constructor(content: Content) {
     Object.assign(this, content);
-    this.tags = plainToClass(TagResultDto, content.tags);
+    this.tags = plainToInstance(TagResultDto, content.tags);
   }
 
   @Expose()
@@ -82,6 +83,7 @@ export class ContentResultDto {
     description: '총 페이지 개수',
   })
   pageCount: number;
+
   @ApiProperty({
     type: [ContentCardDto],
     description: '컨텐츠 카드 목록',

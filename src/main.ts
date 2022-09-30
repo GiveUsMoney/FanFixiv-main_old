@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { BadRequestFilter } from './common/filter/bad-request.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,7 +30,12 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, doc);
 
   // 전역 class-validator 검사 파이프 사용 (후일 커스텀 파이프로 교체 예정)
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
+  app.useGlobalFilters(new BadRequestFilter());
 
   await app.listen(3000);
 }
