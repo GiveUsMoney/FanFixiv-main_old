@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
-import { Tag } from '@src/db/entities/tag.entity';
+import { Tag } from '@src/entities/tag.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from '@src/app.module';
 import { TagTypes } from '@src/interfaces/tag.interface';
