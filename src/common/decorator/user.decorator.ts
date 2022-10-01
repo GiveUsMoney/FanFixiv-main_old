@@ -12,6 +12,6 @@ export const User = createParamDecorator(
     //TODO: 후일 localhost에서 인증서버의 주소로 변경할 것.
     return await api<IProfile>('http://localhost:8080/profile', {
       headers: { authorization },
-    });
+    }).catch(() => null);
   },
 );
