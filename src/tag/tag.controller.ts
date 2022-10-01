@@ -1,5 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { User } from '@src/common/decorator/user.decorator';
+import { IProfile } from '@src/dto/ProfileDto';
 import {
   LimitDto,
   TagDescriptionDto,
@@ -26,8 +28,11 @@ export class TagController {
   @ApiOkResponse({
     type: [TagDescriptionDto],
   })
-  async getAllTags(@Query() dto: LimitDto): Promise<TagDescriptionDto[]> {
-    const items = await this.tagService.findAll(dto);
+  async getAllTags(
+    @User() user: IProfile | null,
+    @Query() dto: LimitDto,
+  ): Promise<TagDescriptionDto[]> {
+    const items = await this.tagService.findAll(user, dto);
     return items.map((item) => new TagDescriptionDto(item));
   }
 
@@ -38,8 +43,11 @@ export class TagController {
   @ApiOkResponse({
     type: [TagResultDto],
   })
-  async getTagsByText(@Query() dto: TagDto): Promise<TagResultDto[]> {
-    const items = await this.tagService.find(dto);
+  async getTagsByText(
+    @User() user: IProfile | null,
+    @Query() dto: TagDto,
+  ): Promise<TagResultDto[]> {
+    const items = await this.tagService.find(user, dto);
     return items.map((item) => new TagResultDto(item));
   }
 }

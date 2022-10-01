@@ -1,10 +1,10 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
-import { IProfile } from '../sdto/ProfileDto';
+import { IProfile } from '@src/dto/ProfileDto';
 import { api } from '../utils/api';
 
 export const User = createParamDecorator(
-  async (data: unknown, ctx: ExecutionContext) => {
+  async (data: unknown, ctx: ExecutionContext): Promise<IProfile | null> => {
     const { authorization } = ctx.switchToHttp().getRequest<Request>().headers;
 
     if (authorization == null) return null;
