@@ -44,6 +44,7 @@ describe('TagController (e2e)', () => {
         name: '테스트 캐릭터',
         description: '테스트용 캐릭터입니다.',
         stauts: true,
+        isAdult: false,
       }),
     );
   });
@@ -54,7 +55,7 @@ describe('TagController (e2e)', () => {
     let normalResult: TagDescriptionDto[];
 
     beforeAll(async () => {
-      tags = await tagService.findAll({
+      tags = await tagService.findAll(null, {
         limit,
       });
 
@@ -85,7 +86,7 @@ describe('TagController (e2e)', () => {
     let normalResult;
 
     beforeAll(async () => {
-      tags = await tagService.findAll({
+      tags = await tagService.findAll(null, {
         limit,
       });
 
