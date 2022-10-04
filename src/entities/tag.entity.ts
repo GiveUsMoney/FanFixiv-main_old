@@ -30,13 +30,11 @@ export class Tag extends Base implements ITag {
 
 @Entity({ name: 'tb_type_name' })
 export class TagName extends Base {
-  @Column({
-    name: 'type_seq',
-  })
+  @Column()
   @IsString()
   typeSeq: string;
 
-  @Column({ name: 'type_name' })
+  @Column()
   @IsString()
   typeName: string;
 }

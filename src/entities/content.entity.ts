@@ -24,6 +24,14 @@ export class Content extends Base implements IContent {
   @ManyToMany(() => Tag)
   @JoinTable({
     name: 'tb_content_tag_reg',
+    joinColumn: {
+      name: 'content_seq',
+      referencedColumnName: 'seq',
+    },
+    inverseJoinColumn: {
+      name: 'tag_seq',
+      referencedColumnName: 'seq',
+    },
   })
   tags: Tag[];
 }
