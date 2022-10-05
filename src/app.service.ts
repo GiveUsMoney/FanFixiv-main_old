@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ITempData } from './interfaces/temp.interface';
+import { TempData } from './interfaces/temp.interface';
 
 /**
  *  테스트용 서비스입니다. 후일 삭제해 주세요.
@@ -18,7 +18,7 @@ export class AppService {
   /**
    * 테스트용 API입니다. 후일 삭제해주세요.
    */
-  getTemp(): ITempData {
+  getTemp(): TempData {
     return {
       id: this.ID++,
       content: 'Hello World!',

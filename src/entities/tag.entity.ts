@@ -1,11 +1,10 @@
-import { Exclude } from 'class-transformer';
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
-import { ITag, TagTypes } from '@src/interfaces/tag.interface';
+import { Tag, TagTypes } from '@src/interfaces/tag.interface';
 import { Entity, Column } from 'typeorm';
-import { Base } from './base.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity({ name: 'tb_tag' })
-export class Tag extends Base implements ITag {
+export class TagEntity extends BaseEntity implements Tag {
   @Column({
     type: 'enum',
     enum: TagTypes,
@@ -22,14 +21,17 @@ export class Tag extends Base implements ITag {
   @IsString()
   description: string;
 
-  @Exclude()
   @IsBoolean()
   @Column({ default: false })
   status: boolean;
+
+  @IsBoolean()
+  @Column({ default: false })
+  isAdult: boolean;
 }
 
 @Entity({ name: 'tb_type_name' })
-export class TagName extends Base {
+export class TagNameEntity extends BaseEntity {
   @Column()
   @IsString()
   typeSeq: string;

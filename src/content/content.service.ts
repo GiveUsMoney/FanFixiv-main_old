@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Content } from '@src/entities/content.entity';
+import { ContentEntity } from '@src/entities/content.entity';
 import { ContentDto } from '@src/dto/content.dto';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class ContentService {
   constructor(
-    @InjectRepository(Content)
-    private contentRepository: Repository<Content>,
+    @InjectRepository(ContentEntity)
+    private contentRepository: Repository<ContentEntity>,
   ) {}
 
   /** @return 컨텐츠 개수 */
@@ -22,7 +22,7 @@ export class ContentService {
    * @param dto.page 표시할 페이지 번호
    * @return 컨텐츠 목록
    */
-  getContent(dto: ContentDto): Promise<Content[]> {
+  getContent(dto: ContentDto): Promise<ContentEntity[]> {
     const { count, page } = dto;
     const skip = count * (page - 1);
     return this.contentRepository.find({

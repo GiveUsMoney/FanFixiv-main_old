@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Tag } from '@src/entities/tag.entity';
-import { ITag, TagTypes } from '@src/interfaces/tag.interface';
+import { TagEntity } from '@src/entities/tag.entity';
+import { Tag, TagTypes } from '@src/interfaces/tag.interface';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsInt, IsString } from '@src/common/validator';
 import { IsEnum, IsOptional } from 'class-validator';
@@ -30,8 +30,8 @@ export class TagDto extends LimitDto {
 }
 
 @Exclude()
-export class TagResultDto implements ITag {
-  constructor(tag: Tag) {
+export class TagResultDto implements Tag {
+  constructor(tag: TagEntity) {
     Object.assign(this, tag);
   }
 
@@ -53,10 +53,12 @@ export class TagResultDto implements ITag {
   description: string;
 
   status: boolean;
+
+  isAdult: boolean;
 }
 
 @Exclude()
-export class TagDescriptionDto extends TagResultDto implements ITag {
+export class TagDescriptionDto extends TagResultDto implements Tag {
   @Expose()
   @IsEnum(TagTypes)
   type: TagTypes;
@@ -74,4 +76,6 @@ export class TagDescriptionDto extends TagResultDto implements ITag {
   description: string;
 
   status: boolean;
+
+  isAdult: boolean;
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Content } from '@src/entities/content.entity';
-import { IContent } from '@src/interfaces/content.interface';
+import { ContentEntity } from '@src/entities/content.entity';
+import { Content } from '@src/interfaces/content.interface';
 import { Exclude, Expose, plainToInstance, Transform } from 'class-transformer';
 import { IsInt, Min } from '@src/common/validator';
 import { TagResultDto } from './tag.dto';
@@ -28,8 +28,8 @@ export class ContentDto {
 }
 
 @Exclude()
-export class ContentCardDto implements IContent {
-  constructor(content: Content) {
+export class ContentCardDto implements Content {
+  constructor(content: ContentEntity) {
     Object.assign(this, content);
     this.tags = plainToInstance(TagResultDto, content.tags);
   }
@@ -73,7 +73,7 @@ export class ContentCardDto implements IContent {
 }
 
 export class ContentResultDto {
-  constructor(pageCount: number, content: Content[]) {
+  constructor(pageCount: number, content: ContentEntity[]) {
     this.pageCount = pageCount;
     this.content = content.map((item) => new ContentCardDto(item));
   }

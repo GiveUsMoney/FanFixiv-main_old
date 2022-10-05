@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ITempData } from '@src/interfaces/temp.interface';
+import { TempData } from '@src/interfaces/temp.interface';
 
-export class TempDataDto implements ITempData {
+export class TempDataDto implements TempData {
   @ApiProperty()
   id: number;
 
