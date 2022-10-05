@@ -2,13 +2,13 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  BaseEntity,
+  BaseEntity as Base,
 } from 'typeorm';
 
 /**
  * 모든 Entity는 해당 Base Class를 상속
  */
-export class Base extends BaseEntity {
+export class BaseEntity extends Base {
   constructor(obj) {
     super();
     Object.assign(this, obj);

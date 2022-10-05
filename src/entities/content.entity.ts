@@ -1,11 +1,11 @@
-import { IContent } from '@src/interfaces/content.interface';
+import { Content } from '@src/interfaces/content.interface';
 import { IsString, IsUrl } from 'class-validator';
 import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
-import { Base } from './base.entity';
-import { Tag } from './tag.entity';
+import { BaseEntity } from './base.entity';
+import { TagEntity } from './tag.entity';
 
 @Entity({ name: 'tb_content' })
-export class Content extends Base implements IContent {
+export class ContentEntity extends BaseEntity implements Content {
   @Column()
   @IsString()
   title: string;
@@ -21,9 +21,9 @@ export class Content extends Base implements IContent {
   // 후일 User테이블이 추가된 후 변경할 예정입니다.
   like: number;
 
-  @ManyToMany(() => Tag)
+  @ManyToMany(() => TagEntity)
   @JoinTable({
     name: 'tb_content_tag_reg',
   })
-  tags: Tag[];
+  tags: TagEntity[];
 }

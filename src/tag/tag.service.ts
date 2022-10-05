@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Tag, TagName } from '@src/entities/tag.entity';
+import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
 import { LimitDto, TagDto } from '@src/dto/TagDto';
 import { Repository } from 'typeorm';
 import { IProfile } from '@src/dto/ProfileDto';
@@ -8,8 +8,8 @@ import { IProfile } from '@src/dto/ProfileDto';
 @Injectable()
 export class TagService {
   constructor(
-    @InjectRepository(Tag)
-    private tagRepository: Repository<Tag>,
+    @InjectRepository(TagEntity)
+    private tagRepository: Repository<TagEntity>,
   ) {}
 
   /**
@@ -20,7 +20,7 @@ export class TagService {
    * @param dto.limit 검색 개수 제한
    * @return 태그 목록
    */
-  findAll(user: IProfile, dto: LimitDto): Promise<Tag[]> {
+  findAll(user: IProfile, dto: LimitDto): Promise<TagEntity[]> {
     return this.tagRepository
       .createQueryBuilder('tag')
       .where('tag.status')
@@ -45,10 +45,10 @@ export class TagService {
    * @param dto.limit 검색 개수 제한
    * @return 태그 목록
    */
-  find(user: IProfile | null, dto: TagDto): Promise<Tag[]> {
+  find(user: IProfile | null, dto: TagDto): Promise<TagEntity[]> {
     return this.tagRepository
       .createQueryBuilder('tag')
-      .innerJoin(TagName, 'tn', 'tn.type_seq = tag.type::text')
+      .innerJoin(TagNameEntity, 'tn', 'tn.type_seq = tag.type::text')
       .where('tag.status')
       .andWhere(
         `not tag."isAdult" 

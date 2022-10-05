@@ -1,4 +1,4 @@
-export interface ITag {
+export interface Tag {
   type: TagTypes;
   name: string;
   description: string;

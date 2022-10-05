@@ -1,4 +1,4 @@
-export interface ITempData {
+export interface TempData {
   id: number;
   content: string;
 }

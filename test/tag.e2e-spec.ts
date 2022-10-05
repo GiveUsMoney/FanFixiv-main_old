@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
-import { Tag } from '@src/entities/tag.entity';
+import { TagEntity } from '@src/entities/tag.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from '@src/app.module';
 import { TagTypes } from '@src/interfaces/tag.interface';
@@ -14,9 +14,9 @@ import { plainToInstance } from 'class-transformer';
 describe('TagController (e2e)', () => {
   let app: INestApplication;
   let tagService: TagService;
-  let tagRepository: Repository<Tag>;
+  let tagRepository: Repository<TagEntity>;
 
-  let testTag: Tag;
+  let testTag: TagEntity;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -24,14 +24,16 @@ describe('TagController (e2e)', () => {
       providers: [
         TagService,
         {
-          provide: getRepositoryToken(Tag),
-          useClass: Repository<Tag>,
+          provide: getRepositoryToken(TagEntity),
+          useClass: Repository<TagEntity>,
         },
       ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    tagRepository = moduleFixture.get<Repository<Tag>>(getRepositoryToken(Tag));
+    tagRepository = moduleFixture.get<Repository<TagEntity>>(
+      getRepositoryToken(TagEntity),
+    );
     tagService = moduleFixture.get<TagService>(TagService);
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
@@ -39,7 +41,7 @@ describe('TagController (e2e)', () => {
     await app.init();
 
     testTag = await tagRepository.save(
-      new Tag({
+      new TagEntity({
         type: TagTypes.CHARACTOR,
         name: '테스트 캐릭터',
         description: '테스트용 캐릭터입니다.',
@@ -51,7 +53,7 @@ describe('TagController (e2e)', () => {
 
   describe('/tag/all (GET)', () => {
     const limit = 5;
-    let tags: Tag[];
+    let tags: TagEntity[];
     let normalResult: TagDescriptionDto[];
 
     beforeAll(async () => {
@@ -82,7 +84,7 @@ describe('TagController (e2e)', () => {
   describe('/tag (GET)', () => {
     const limit = 5;
     const s = encodeURIComponent('테스트 캐릭터');
-    let tags: Tag[];
+    let tags: TagEntity[];
     let normalResult;
 
     beforeAll(async () => {

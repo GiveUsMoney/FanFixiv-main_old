@@ -1,9 +1,9 @@
-import { ITag } from './tag.interface';
+import { Tag } from './tag.interface';
 
-export interface IContent {
+export interface Content {
   title: string;
   thumbnail: string;
   translateReview: string;
   like: number;
-  tags: ITag[];
+  tags: Tag[];
 }
