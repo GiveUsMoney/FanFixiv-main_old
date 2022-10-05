@@ -25,13 +25,14 @@ export class TagService {
       .createQueryBuilder('tag')
       .where('tag.status')
       .andWhere(
-        `not tag."isAdult" 
+        `not tag."is_adult" 
         or (
-          tag."isAdult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18) `,
+          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18) `,
         {
           birth: user?.birth ?? '3000-01-01',
         },
       )
+      .orderBy('tag.name', 'ASC')
       .limit(dto.limit)
       .getMany();
   }
@@ -51,9 +52,9 @@ export class TagService {
       .innerJoin(TagNameEntity, 'tn', 'tn.type_seq = tag.type::text')
       .where('tag.status')
       .andWhere(
-        `not tag."isAdult" 
+        `not tag."is_adult" 
         or (
-          tag."isAdult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18)`,
+          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18)`,
         {
           birth: user?.birth ?? '3000-01-01',
         },
@@ -61,6 +62,7 @@ export class TagService {
       .andWhere("concat(tn.type_name, ':', tag.name) ILIKE :search", {
         search: `%${dto.s}%`,
       })
+      .orderBy('tag.name', 'ASC')
       .limit(dto.limit)
       .getMany();
   }
