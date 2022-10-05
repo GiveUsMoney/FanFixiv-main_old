@@ -5,7 +5,7 @@ import {
   TagDescriptionDto,
   TagDto,
   TagResultDto,
-} from '@src/dto/TagDto';
+} from '@src/dto/tag.dto';
 import { TagService } from './tag.service';
 
 /**

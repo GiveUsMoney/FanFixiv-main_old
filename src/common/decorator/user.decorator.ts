@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
-import { IProfile } from '../sdto/ProfileDto';
+import { IProfile } from '../sdto/profile.dto';
 import { api } from '../utils/api';
 
 export const User = createParamDecorator(

@@ -7,7 +7,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from '@src/app.module';
 import { TagTypes } from '@src/interfaces/tag.interface';
 import { TagService } from '@src/tag/tag.service';
-import { TagDescriptionDto, TagResultDto } from '@src/dto/TagDto';
+import { TagDescriptionDto, TagResultDto } from '@src/dto/tag.dto';
 import { ValidationPipe } from '@nestjs/common/pipes';
 import { plainToInstance } from 'class-transformer';
 
