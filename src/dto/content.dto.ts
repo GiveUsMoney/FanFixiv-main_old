@@ -3,7 +3,7 @@ import { ContentEntity } from '@src/entities/content.entity';
 import { Content } from '@src/interfaces/content.interface';
 import { Exclude, Expose, plainToInstance, Transform } from 'class-transformer';
 import { IsInt, Min } from '@src/common/validator';
-import { TagResultDto } from './TagDto';
+import { TagResultDto } from './tag.dto';
 
 export class ContentDto {
   @IsInt()

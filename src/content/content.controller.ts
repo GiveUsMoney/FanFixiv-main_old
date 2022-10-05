@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { Query } from '@nestjs/common/decorators';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { ContentDto, ContentResultDto } from '@src/dto/ContentDto';
+import { ContentDto, ContentResultDto } from '@src/dto/content.dto';
 import { ContentService } from './content.service';
 
 /**

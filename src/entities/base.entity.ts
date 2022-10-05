@@ -17,9 +17,9 @@ export class BaseEntity extends Base {
   @PrimaryGeneratedColumn()
   seq: number;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 }

@@ -32,13 +32,11 @@ export class TagEntity extends BaseEntity implements Tag {
 
 @Entity({ name: 'tb_type_name' })
 export class TagNameEntity extends BaseEntity {
-  @Column({
-    name: 'type_seq',
-  })
+  @Column()
   @IsString()
   typeSeq: string;
 
-  @Column({ name: 'type_name' })
+  @Column()
   @IsString()
   typeName: string;
 }

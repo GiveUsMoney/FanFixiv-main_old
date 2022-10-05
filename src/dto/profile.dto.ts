@@ -1,4 +1,4 @@
-export interface IProfile {
+export interface Profile {
   email: string;
   nickname: string;
   profile_img: string;
