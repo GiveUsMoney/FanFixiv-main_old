@@ -7,6 +7,7 @@ import { ContentModule } from './content/content.module';
 import { TypeOrmConfigService } from './config/db.config';
 import { TagModule } from './tag/tag.module';
 import { JwtStrategy } from './common/strategy/jwt.strategy';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { JwtStrategy } from './common/strategy/jwt.strategy';
     // 이하는 API 모듈 일람
     TagModule,
     ContentModule,
+    UploadModule,
   ],
   // 후일 삭제 바람.
   controllers: [AppController],
