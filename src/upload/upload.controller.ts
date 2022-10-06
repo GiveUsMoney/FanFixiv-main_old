@@ -1,45 +1,34 @@
-import { Controller, Post, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { ApiTags } from '@nestjs/swagger';
 import { UploadService } from './upload.service';
-import * as multerS3 from 'multer-s3';
-import { S3Client } from '@aws-sdk/client-s3';
-import { config } from 'dotenv';
-
-config({
-  path: `.env.${process.env.NODE_ENV}`,
-});
-
-const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-});
+import { TempImageStorage } from '@src/common/storage/multer-s3.storage';
+import { FileLocation } from '@src/interfaces/upload.interface';
+import { FileLocationDto } from '@src/dto/upload.dto';
 
 @ApiTags('upload')
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post('profile')
+  @Post('temp')
   @UseInterceptors(
     FileInterceptor('images', {
-      storage: multerS3({
-        s3: s3,
-        bucket: AWS_S3_BUCKET_NAME,
-        acl: 'public-read',
-        key: function (_: Express.Request, file: Express.Multer.File, cb: any) {
-          cb(
-            null,
-            'temp/' +
-              Date.now().toString() +
-              '.' +
-              file.originalname.split('.').pop(),
-          );
-        },
-      }),
+      storage: TempImageStorage,
     }),
   )
-  uploadProfileImg(): string {
-    return 'Test Message';
+  uploadTempImg(@UploadedFile() file: Express.MulterS3.File): FileLocation {
+    return { location: file.location, key: file.key };
+  }
+
+  @Post('to-profile')
+  uploadToProfile(@Body() dto: FileLocationDto): Promise<{ status: number }> {
+    return this.uploadService.toProfile(dto);
   }
 }
