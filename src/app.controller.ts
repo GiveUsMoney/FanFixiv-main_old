@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { TempDataDto } from './dto/TempDataDto';
+import { TempDataDto } from './dto/temp-data.dto';
 
 /**
  * 테스트용 Controller

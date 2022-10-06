@@ -2,7 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Tag } from '@src/entities/tag.entity';
 import { ITag, TagTypes } from '@src/interfaces/tag.interface';
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { IsInt, IsString, IsOptional, IsEnum } from 'class-validator';
+import { IsInt, IsString } from '@src/common/validator';
+import { IsEnum, IsOptional } from 'class-validator';
 
 export class LimitDto {
   @IsOptional()

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tag, TagName } from '@src/entities/tag.entity';
-import { LimitDto, TagDto } from '@src/dto/TagDto';
+import { LimitDto, TagDto } from '@src/dto/tag.dto';
 import { Repository } from 'typeorm';
 
 @Injectable()
