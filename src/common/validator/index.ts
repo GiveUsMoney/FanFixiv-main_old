@@ -2,6 +2,7 @@ import {
   IsString as _IsString,
   IsInt as _IsInt,
   Min as _Min,
+  IsUrl as _IsUrl,
 } from 'class-validator';
 
 export const IsString = () =>
@@ -17,4 +18,9 @@ export const IsInt = () =>
 export const Min = (value: number) =>
   _Min(value, {
     message: `$property가 너무 작습니다. (최소 ${value} 이상)`,
+  });
+
+export const IsUrl = () =>
+  _IsUrl({
+    message: `$property가 URL이 아닙니다.`,
   });

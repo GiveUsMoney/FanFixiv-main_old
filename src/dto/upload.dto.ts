@@ -1,10 +1,20 @@
 import { FileLocation } from '@src/interfaces/upload.interface';
-import { IsString } from '@src/common/validator';
+import { IsInt, IsString, IsUrl } from '@src/common/validator';
+import { IsOptional } from 'class-validator';
 
 export class FileLocationDto implements FileLocation {
-  @IsString()
+  @IsUrl()
   location: string;
 
   @IsString()
   key: string;
+}
+
+export class UploadResultDto {
+  @IsInt()
+  status: number;
+
+  @IsOptional()
+  @IsString()
+  message?: string;
 }
