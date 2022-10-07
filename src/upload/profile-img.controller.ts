@@ -9,8 +9,11 @@ import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { ApiTags } from '@nestjs/swagger';
 import { ProfileImgService } from './profile-img.service';
 import { TempImageStorage } from '@src/common/storage/multer-s3.storage';
-import { FileLocation } from '@src/interfaces/upload.interface';
-import { FileLocationDto, UploadResultDto } from '@src/dto/upload.dto';
+import {
+  FileLocationResultDto,
+  ProfileFormDto,
+  ProfileFormResultDto,
+} from '@src/dto/upload.dto';
 
 @ApiTags('profile-img')
 @Controller('profile-img')
@@ -23,7 +26,9 @@ export class ProfileImgController {
       storage: TempImageStorage,
     }),
   )
-  uploadTemp(@UploadedFile() file: Express.MulterS3.File): FileLocation {
+  uploadTemp(
+    @UploadedFile() file: Express.MulterS3.File,
+  ): FileLocationResultDto {
     return { location: file.location, key: file.key };
   }
 
@@ -33,7 +38,7 @@ export class ProfileImgController {
    *  2. 토큰 생성
    */
   @Post('form')
-  uploadForm(@Body() dto: FileLocationDto): Promise<UploadResultDto> {
+  uploadForm(@Body() dto: ProfileFormDto): Promise<ProfileFormResultDto> {
     return this.uploadService.toProfile(dto);
   }
 }

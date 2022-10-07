@@ -1,11 +1,11 @@
 import { CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { AWS_S3_BUCKET_NAME, s3 } from '@src/config/aws.config';
-import { FileLocationDto, UploadResultDto } from '@src/dto/upload.dto';
+import { ProfileFormDto, ProfileFormResultDto } from '@src/dto/upload.dto';
 
 @Injectable()
 export class ProfileImgService {
-  async toProfile(dto: FileLocationDto): Promise<UploadResultDto> {
+  async toProfile(dto: ProfileFormDto): Promise<ProfileFormResultDto> {
     try {
       const realKey = dto.key.split('/').pop();
 
@@ -23,12 +23,12 @@ export class ProfileImgService {
         }),
       );
 
-      return { status: 200 };
+      return { status: 200, key: 'profile/' + realKey };
     } catch (e: unknown) {
       console.error(e);
       let message = null;
       if (e instanceof Error) message = e.message;
-      return { status: 400, message };
+      return { status: 400, key: '', message };
     }
   }
 }
