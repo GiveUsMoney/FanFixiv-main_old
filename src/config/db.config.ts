@@ -6,7 +6,7 @@ import { Tag, TagName } from '@src/entities/tag.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Injectable()
-class TypeOrmConfigService implements TypeOrmOptionsFactory {
+export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
@@ -24,5 +24,3 @@ class TypeOrmConfigService implements TypeOrmOptionsFactory {
     };
   }
 }
-
-export { TypeOrmConfigService };
