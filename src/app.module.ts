@@ -7,7 +7,7 @@ import { ContentModule } from './content/content.module';
 import { TypeOrmConfigService } from './config/db.config';
 import { TagModule } from './tag/tag.module';
 import { JwtStrategy } from './common/strategy/jwt.strategy';
-import { ProfileImgModule } from './upload/profile-img.module';
+import { ProfileImgModule } from './profile-img/profile-img.module';
 
 @Module({
   imports: [

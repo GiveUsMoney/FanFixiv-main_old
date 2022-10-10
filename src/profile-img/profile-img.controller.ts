@@ -32,11 +32,6 @@ export class ProfileImgController {
     return { location: file.location, key: file.key };
   }
 
-  /**
-   * TODO: 해당 API에 대한 접근을 유저 서버만 가능하도록 구현.
-   *  1. IP 접근 제한
-   *  2. 토큰 생성
-   */
   @Post('form')
   uploadForm(@Body() dto: ProfileFormDto): Promise<ProfileFormResultDto> {
     return this.uploadService.toProfile(dto);
