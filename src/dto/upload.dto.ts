@@ -13,6 +13,9 @@ export class FileLocationResultDto implements FileLocation {
 export class ProfileFormDto {
   @IsString()
   key: string;
+
+  @IsString()
+  auth: string;
 }
 
 export class ProfileFormResultDto {

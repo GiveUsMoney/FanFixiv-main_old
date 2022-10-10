@@ -8,6 +8,8 @@ import { TypeOrmConfigService } from './config/db.config';
 import { TagModule } from './tag/tag.module';
 import { JwtStrategy } from './common/strategy/jwt.strategy';
 import { ProfileImgModule } from './profile-img/profile-img.module';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { RedisConfigService } from './config/redis.config';
 
 @Module({
   imports: [
@@ -20,6 +22,9 @@ import { ProfileImgModule } from './profile-img/profile-img.module';
     // 모든 Config는 TypeOrmConfigService에 존재.
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
+    }),
+    RedisModule.forRootAsync({
+      useClass: RedisConfigService,
     }),
     // 이하는 API 모듈 일람
     TagModule,
