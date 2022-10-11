@@ -13,14 +13,13 @@ export class ProfileImgService {
   async toProfile(dto: ProfileFormDto): Promise<ProfileFormResultDto> {
     const auth = await this.redis.get('REDIS_AUTH');
 
-    if (auth === dto.auth) {
-      await this.redis.set('REDIS_AUTH', uuidv4());
+    if (auth !== dto.auth)
       return {
         status: 400,
         key: '',
         message: '사용자는 접근할수 없는 API입니다.',
       };
-    }
+    else await this.redis.set('REDIS_AUTH', uuidv4());
 
     try {
       const realKey = dto.key.split('/').pop();
