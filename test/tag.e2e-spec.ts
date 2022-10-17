@@ -17,6 +17,18 @@ describe('TagController (e2e)', () => {
   let tagRepository: Repository<TagEntity>;
 
   let testTag: TagEntity;
+  let testAdultTag: TagEntity;
+
+  const adultProfile = {
+    email: '',
+    nickname: '',
+    profile_img: '',
+    descript: '',
+
+    nn_md_date: '',
+    birth: '2000-01-01',
+    _tr: false,
+  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -45,8 +57,18 @@ describe('TagController (e2e)', () => {
         type: TagTypes.CHARACTOR,
         name: '테스트 캐릭터',
         description: '테스트용 캐릭터입니다.',
-        stauts: true,
+        status: true,
         isAdult: false,
+      }),
+    );
+
+    testAdultTag = await tagRepository.save(
+      new TagEntity({
+        type: TagTypes.CHARACTOR,
+        name: '테스트 캐릭터 (성인)',
+        description: '테스트용 캐릭터입니다. (성인)',
+        status: true,
+        isAdult: true,
       }),
     );
   });
@@ -55,6 +77,7 @@ describe('TagController (e2e)', () => {
     const limit = 5;
     let tags: TagEntity[];
     let normalResult: TagDescriptionDto[];
+    let adultResult: TagDescriptionDto[];
 
     beforeAll(async () => {
       tags = await tagService.findAll(null, {
@@ -62,6 +85,15 @@ describe('TagController (e2e)', () => {
       });
 
       normalResult = tags.map((item) => {
+        const { ...obj } = plainToInstance(TagDescriptionDto, item);
+        return obj;
+      });
+
+      tags = await tagService.findAll(adultProfile, {
+        limit,
+      });
+
+      adultResult = tags.map((item) => {
         const { ...obj } = plainToInstance(TagDescriptionDto, item);
         return obj;
       });
@@ -74,6 +106,14 @@ describe('TagController (e2e)', () => {
         .expect(normalResult);
     });
 
+    test('200 (adult)', () => {
+      return request(app.getHttpServer())
+        .get(`/tag/all?limit=${5}`)
+        .set('Authorization', 'Bearer TESTTOKEN')
+        .expect(200)
+        .expect(adultResult);
+    });
+
     test('400', () => {
       return request(app.getHttpServer())
         .get(`/tag/all?limit=test`)
@@ -83,16 +123,29 @@ describe('TagController (e2e)', () => {
 
   describe('/tag (GET)', () => {
     const limit = 5;
-    const s = encodeURIComponent('테스트 캐릭터');
+    const _s = '테스트 캐릭터';
+    const s = encodeURIComponent(_s);
     let tags: TagEntity[];
-    let normalResult;
+    let normalResult: TagResultDto[];
+    let adultResult: TagResultDto[];
 
     beforeAll(async () => {
-      tags = await tagService.findAll(null, {
+      tags = await tagService.find(null, {
+        s: _s,
         limit,
       });
 
       normalResult = tags.map((item) => {
+        const { ...obj } = plainToInstance(TagResultDto, item);
+        return obj;
+      });
+
+      tags = await tagService.find(adultProfile, {
+        s: _s,
+        limit,
+      });
+
+      adultResult = tags.map((item) => {
         const { ...obj } = plainToInstance(TagResultDto, item);
         return obj;
       });
@@ -103,6 +156,14 @@ describe('TagController (e2e)', () => {
         .get(`/tag?s=${s}&limit=${limit}`)
         .expect(200)
         .expect(normalResult);
+    });
+
+    test('200 (adult)', () => {
+      return request(app.getHttpServer())
+        .get(`/tag?s=${s}&limit=${limit}`)
+        .set('Authorization', 'Bearer TOKEN')
+        .expect(200)
+        .expect(adultResult);
     });
 
     test('400 (limit type wrong)', () => {
@@ -118,5 +179,6 @@ describe('TagController (e2e)', () => {
 
   afterAll(async () => {
     tagRepository.delete(testTag.seq);
+    tagRepository.delete(testAdultTag.seq);
   });
 });
