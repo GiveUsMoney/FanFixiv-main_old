@@ -1,6 +1,8 @@
+import { RedisService } from '@liaoliaots/nestjs-redis';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import { v4 as uuidv4 } from 'uuid';
 import { AppModule } from './app.module';
 import { BadRequestFilter } from './common/filter/bad-request.filter';
 
@@ -36,6 +38,10 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new BadRequestFilter());
+
+  const redisClient = await app.resolve(RedisService);
+  const redis = redisClient.getClient();
+  await redis.set('REDIS_AUTH', uuidv4());
 
   await app.listen(3000);
 }
