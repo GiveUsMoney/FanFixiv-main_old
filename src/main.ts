@@ -1,5 +1,6 @@
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
@@ -42,6 +43,12 @@ async function bootstrap() {
   const redisClient = await app.resolve(RedisService);
   const redis = redisClient.getClient();
   await redis.set('REDIS_AUTH', uuidv4());
+
+  const configService = await app.resolve(ConfigService);
+
+  app.enableCors({
+    origin: ['http://localhost:3000/', configService.get('FRONTEND_URL')],
+  });
 
   await app.listen(3000);
 }
