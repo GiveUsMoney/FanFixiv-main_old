@@ -18,4 +18,5 @@ export enum TagTypes {
   CHARACTOR,
   ATTRIBUTE,
   LANGUAGE,
+  EXTRA,
 }
