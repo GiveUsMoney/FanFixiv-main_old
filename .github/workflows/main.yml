@@ -41,6 +41,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
+
       # Runs a single command using the runners shell
       - name: run the e2e test
         run: |
@@ -58,6 +62,8 @@ jobs:
           DB_PW: ${{ secrets.DB_PW }}
           DB_NAME: ${{ secrets.DB_NAME }}
           MQ_URI: amqp://guest:guest@localhost:5672
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
 
   lint:
     # The type of runner that the job will run on
