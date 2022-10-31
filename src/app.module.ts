@@ -10,6 +10,7 @@ import { JwtStrategy } from './common/strategy/jwt.strategy';
 import { ProfileImgModule } from './profile-img/profile-img.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisConfigService } from './config/redis.config';
+import { RabbitModule } from './rabbitmq/rabbit.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RedisConfigService } from './config/redis.config';
     TagModule,
     ContentModule,
     ProfileImgModule,
+    RabbitModule,
   ],
   // 후일 삭제 바람.
   controllers: [AppController],
