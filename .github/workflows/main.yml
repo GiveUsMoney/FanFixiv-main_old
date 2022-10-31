@@ -35,7 +35,7 @@ jobs:
           RABBITMQ_DEFAULT_USER: guest
           RABBITMQ_DEFAULT_PASS: guest
         ports:
-          - 5672
+          - 5672:5672
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
