@@ -11,6 +11,7 @@ import { ProfileImgModule } from './profile-img/profile-img.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisConfigService } from './config/redis.config';
 import { RabbitModule } from './rabbitmq/rabbit.module';
+import { ShutDownService } from './common/event/shutdown.event';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { RabbitModule } from './rabbitmq/rabbit.module';
       provide: 'APP_INTERCEPTOR',
       useClass: ClassSerializerInterceptor,
     },
+    ShutDownService,
   ],
 })
 export class AppModule {}
