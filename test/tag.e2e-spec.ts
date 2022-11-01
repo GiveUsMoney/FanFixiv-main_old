@@ -13,6 +13,8 @@ import { plainToInstance } from 'class-transformer';
 
 describe('TagController (e2e)', () => {
   let app: INestApplication;
+  let module: TestingModule;
+
   let tagService: TagService;
   let tagRepository: Repository<TagEntity>;
 
@@ -31,7 +33,7 @@ describe('TagController (e2e)', () => {
   };
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       imports: [AppModule],
       providers: [
         TagService,
@@ -42,11 +44,11 @@ describe('TagController (e2e)', () => {
       ],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    tagRepository = moduleFixture.get<Repository<TagEntity>>(
+    app = module.createNestApplication();
+    tagRepository = module.get<Repository<TagEntity>>(
       getRepositoryToken(TagEntity),
     );
-    tagService = moduleFixture.get<TagService>(TagService);
+    tagService = module.get<TagService>(TagService);
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -178,7 +180,9 @@ describe('TagController (e2e)', () => {
   });
 
   afterAll(async () => {
-    tagRepository.delete(testTag.seq);
-    tagRepository.delete(testAdultTag.seq);
+    await tagRepository.delete(testTag.seq);
+    await tagRepository.delete(testAdultTag.seq);
+    await app.close();
+    await module.close();
   });
 });
