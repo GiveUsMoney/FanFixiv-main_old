@@ -39,16 +39,19 @@ jobs:
           npm ci
           npm run test:e2e
         env:
+          SECRET: ${{ secrets.SECRET }}
           AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SECRET: ${{ secrets.SECRET }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PW: ${{ secrets.DB_PW }}
-          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PW: postgres
+          DB_NAME: fanfixiv
+          MQ_URI: amqp://guest:guest@localhost:5672
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
 
   lint:
     # The type of runner that the job will run on
