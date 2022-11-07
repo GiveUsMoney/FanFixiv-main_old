@@ -5,13 +5,14 @@ import { AppModule } from '@src/app.module';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let module: TestingModule;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = module.createNestApplication();
 
     await app.init();
   });
@@ -28,5 +29,10 @@ describe('AppController (e2e)', () => {
       id: 0,
       content: 'Hello World!',
     });
+  });
+
+  afterAll(async () => {
+    await app.close();
+    await module.close();
   });
 });
