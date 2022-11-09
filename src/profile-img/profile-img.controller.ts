@@ -5,7 +5,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { TempImageStorage } from '@src/common/storage/multer-s3.storage';
 import { FileLocationResultDto } from '@src/dto/upload.dto';
 
@@ -13,6 +13,18 @@ import { FileLocationResultDto } from '@src/dto/upload.dto';
 @Controller('profile-img')
 export class ProfileImgController {
   @Post('temp')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        images: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor('images', {
       storage: TempImageStorage,

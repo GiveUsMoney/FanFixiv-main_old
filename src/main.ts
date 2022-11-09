@@ -16,7 +16,16 @@ async function bootstrap() {
       .setTitle('FanFixiv 업로드 Swagger')
       .setDescription('Fanfixiv 인증 RestApi Swagger입니다.')
       .setVersion('1.0')
-      .addTag('temp');
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          name: 'JWT',
+          description: '유저서버에서 발급한 JWT 토큰을 입력해주세요.',
+          in: 'header',
+        },
+        'Authorization',
+      );
 
     // 개발 서버에 배포된 경우 /upload path를 추가합니다
     if (process.env.DEV_SERVER) {
@@ -24,7 +33,6 @@ async function bootstrap() {
     }
 
     const config = _config.build();
-    config.openapi = '3.0.0';
     doc = SwaggerModule.createDocument(app, config);
   }
   // /api path에 swagger를 표시합니다.
