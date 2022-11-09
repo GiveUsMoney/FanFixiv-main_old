@@ -38,6 +38,7 @@ export class TagResultDto implements Tag {
   @Expose()
   @IsEnum(TagTypes)
   @ApiProperty({
+    enum: TagTypes,
     description: '태그 종류',
   })
   type: TagTypes;

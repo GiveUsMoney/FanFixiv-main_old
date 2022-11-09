@@ -1,5 +1,10 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from '@src/common/decorator/user.decorator';
 import { Profile } from '@src/dto/profile.dto';
 import {
@@ -22,6 +27,7 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @Get('all')
+  @ApiBearerAuth()
   @ApiQuery({
     type: LimitDto,
   })
@@ -37,6 +43,7 @@ export class TagController {
   }
 
   @Get()
+  @ApiBearerAuth()
   @ApiQuery({
     type: TagDto,
   })
