@@ -5,7 +5,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TempImageStorage } from '@src/common/storage/multer-s3.storage';
 import { FileLocationResultDto } from '@src/dto/upload.dto';
 
@@ -24,6 +24,9 @@ export class ProfileImgController {
         },
       },
     },
+  })
+  @ApiOkResponse({
+    type: FileLocationResultDto,
   })
   @UseInterceptors(
     FileInterceptor('images', {
