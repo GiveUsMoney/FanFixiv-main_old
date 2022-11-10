@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { ContentEntity } from '@src/entities/content.entity';
+import { LikesEntity } from '@src/entities/likes.entity';
 import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
@@ -19,7 +20,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       database: this.configService.get('DB_NAME'),
       synchronize: true,
       logging: process.env.NODE_ENV === 'dev',
-      entities: [TagEntity, TagNameEntity, ContentEntity],
+      entities: [TagEntity, TagNameEntity, ContentEntity, LikesEntity],
       namingStrategy: new SnakeNamingStrategy(),
     };
   }

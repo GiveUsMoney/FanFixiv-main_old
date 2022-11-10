@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { Query } from '@nestjs/common/decorators';
+import { Query, UseGuards } from '@nestjs/common/decorators';
 import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { Profile } from '@src/common/decorator/user.decorator';
+import { Profile, User } from '@src/common/decorator/user.decorator';
+import { JwtAuthGuard } from '@src/common/guard/jwt-auth.guard';
 import { ContentDto, ContentResultDto } from '@src/dto/content.dto';
 import { UserProfile } from '@src/dto/user.dto';
 import { ContentService } from './content.service';
@@ -22,23 +23,23 @@ export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiQuery({
     type: ContentDto,
   })
   @ApiOkResponse({ type: ContentResultDto })
   async getContent(
+    @User() user: number,
     @Profile() profile: UserProfile | null,
     @Query() dto: ContentDto,
   ): Promise<ContentResultDto> {
-    const items = await this.contentService.getContent(profile, dto);
-    const contents = items.map((item) => {
-      item.like = 99; // <- 더미 좋아요 기능. 후일 삭제 예정
-      return item;
-    });
-    const count = Math.ceil(
-      (await this.contentService.getContentCount()) / dto.count,
+    const [contents, count] = await this.contentService.getContent(
+      user,
+      profile,
+      dto,
     );
-    return new ContentResultDto(count, contents);
+    const page = Math.ceil(count / dto.count);
+    return new ContentResultDto(page, contents);
   }
 }

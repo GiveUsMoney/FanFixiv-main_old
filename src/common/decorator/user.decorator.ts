@@ -9,11 +9,11 @@ config({
 });
 
 export const User = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): UserInfo => {
+  (_data: unknown, ctx: ExecutionContext): number | null => {
     const { user } = ctx
       .switchToHttp()
       .getRequest<Request & { user: UserInfo }>();
-    return user;
+    return user ? parseInt(user?.sub) : -1;
   },
 );
 
@@ -38,7 +38,6 @@ export const Profile = createParamDecorator(
       });
     }
 
-    //TODO: 후일 localhost에서 인증서버의 주소로 변경할 것.
     return api<UserProfile>(process.env.USER_SERVER + '/profile', {
       headers: { authorization },
     }).catch(() => null);

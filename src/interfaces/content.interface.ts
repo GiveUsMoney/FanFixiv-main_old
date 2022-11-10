@@ -6,5 +6,6 @@ export interface Content {
   translateReview: string;
   isAdult: boolean;
   like: number;
+  doLike: boolean;
   tags: Tag[];
 }

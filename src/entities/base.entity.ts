@@ -9,7 +9,7 @@ import {
  * 모든 Entity는 해당 Base Class를 상속
  */
 export class BaseEntity extends Base {
-  constructor(obj) {
+  constructor(obj: any) {
     super();
     Object.assign(this, obj);
   }

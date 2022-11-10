@@ -79,6 +79,13 @@ export class ContentCardDto implements Content {
   })
   like: number;
 
+  @Expose()
+  @ApiProperty({
+    type: Boolean,
+    description: '좋아요 여부',
+  })
+  doLike: boolean;
+
   translateReview: string;
 
   @Expose()

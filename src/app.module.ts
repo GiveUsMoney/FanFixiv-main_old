@@ -12,6 +12,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisConfigService } from './config/redis.config';
 import { RabbitModule } from './rabbitmq/rabbit.module';
 import { ShutDownService } from './common/event/shutdown.event';
+import { LikesModule } from './likes/like.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ShutDownService } from './common/event/shutdown.event';
     // 이하는 API 모듈 일람
     TagModule,
     ContentModule,
+    LikesModule,
     ProfileImgModule,
     RabbitModule,
   ],

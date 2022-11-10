@@ -1,21 +1,22 @@
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { UserInfo } from '@src/dto/user.dto';
+import { ROLES_KEY } from '../enum/roles.enum';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  canActivate(context: ExecutionContext) {
-    return super.canActivate(context);
+  constructor(private reflector: Reflector) {
+    super();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleRequest(err: any, user: any, info: any, context: any, status?: any) {
-    if (err || !user) {
-      throw err || new UnauthorizedException();
-    }
-    return user;
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const result = await super.canActivate(context);
+    const roles = this.reflector.get<string[]>(ROLES_KEY, context.getHandler());
+    const { user } = context.switchToHttp().getRequest<{ user: UserInfo }>();
+
+    if (!roles) return true;
+
+    return user.roles.some((x) => roles.includes(x)) && (result as boolean);
   }
 }
