@@ -2,6 +2,11 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { api } from '../utils/api';
 import { Profile } from '@src/dto/profile.dto';
+import { config } from 'dotenv';
+
+config({
+  path: `.env.${process.env.NODE_ENV}`,
+});
 
 export const User = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): Promise<Profile | null> => {
@@ -24,8 +29,7 @@ export const User = createParamDecorator(
       });
     }
 
-    //TODO: 후일 localhost에서 인증서버의 주소로 변경할 것.
-    return api<Profile>('http://localhost:8080/profile', {
+    return api<Profile>(process.env.USER_SERVER + '/profile', {
       headers: { authorization },
     }).catch(() => null);
   },
