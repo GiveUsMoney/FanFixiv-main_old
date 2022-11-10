@@ -1,9 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ContentEntity } from '@src/entities/content.entity';
 import { Content } from '@src/interfaces/content.interface';
 import { Exclude, Expose, plainToInstance, Transform } from 'class-transformer';
 import { IsInt, Min } from '@src/common/validator';
 import { TagResultDto } from './tag.dto';
+import { IsOptional } from 'class-validator';
 
 export class ContentDto {
   @IsInt()
@@ -25,6 +26,15 @@ export class ContentDto {
     default: 1,
   })
   page = 1;
+
+  @IsInt({ each: true })
+  @IsOptional()
+  @Transform((x) => (x.value as string).split(',')?.map((v) => parseInt(v)))
+  @ApiPropertyOptional({
+    description: '검색할 태그 목록',
+    type: String,
+  })
+  tags: number[];
 }
 
 @Exclude()
@@ -54,6 +64,13 @@ export class ContentCardDto implements Content {
     description: '썸네일 링크',
   })
   thumbnail: string;
+
+  @Expose()
+  @ApiProperty({
+    type: Boolean,
+    description: '성인용 컨텐츠 여부',
+  })
+  isAdult: boolean;
 
   @Expose()
   @ApiProperty({

@@ -1,5 +1,5 @@
 import { Content } from '@src/interfaces/content.interface';
-import { IsString, IsUrl } from 'class-validator';
+import { IsBoolean, IsString, IsUrl } from 'class-validator';
 import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { TagEntity } from './tag.entity';
@@ -17,6 +17,10 @@ export class ContentEntity extends BaseEntity implements Content {
   @Column()
   @IsString()
   translateReview: string;
+
+  @Column()
+  @IsBoolean()
+  isAdult: boolean;
 
   // 후일 User테이블이 추가된 후 변경할 예정입니다.
   like: number;
