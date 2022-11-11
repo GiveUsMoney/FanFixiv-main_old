@@ -17,6 +17,7 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { RabbitConfigService } from '@src/config/rabbit.config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { ActionInterceptor } from './common/interceptor/action.interceptor';
 
 @Module({
   imports: [
@@ -54,6 +55,11 @@ import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    // 관리자 액션 전송 인터셉터
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ActionInterceptor,
     },
     // 모든 API에 가드 추가 (Roles 추가가 되지 않으면 그냥 통과됨.)
     {
