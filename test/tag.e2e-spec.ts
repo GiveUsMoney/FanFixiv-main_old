@@ -6,37 +6,23 @@ import { TagEntity } from '@src/entities/tag.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from '@src/app.module';
 import { TagTypes } from '@src/interfaces/tag.interface';
-import { TagService } from '@src/tag/tag.service';
 import { TagDescriptionDto, TagResultDto } from '@src/dto/tag.dto';
 import { ValidationPipe } from '@nestjs/common/pipes';
-import { plainToInstance } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 
 describe('TagController (e2e)', () => {
   let app: INestApplication;
   let module: TestingModule;
 
-  let tagService: TagService;
   let tagRepository: Repository<TagEntity>;
 
   let testTag: TagEntity;
   let testAdultTag: TagEntity;
 
-  const adultProfile = {
-    email: '',
-    nickname: '',
-    profile_img: '',
-    descript: '',
-
-    nn_md_date: '',
-    birth: '2000-01-01',
-    _tr: false,
-  };
-
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [AppModule],
       providers: [
-        TagService,
         {
           provide: getRepositoryToken(TagEntity),
           useClass: Repository<TagEntity>,
@@ -48,7 +34,6 @@ describe('TagController (e2e)', () => {
     tagRepository = module.get<Repository<TagEntity>>(
       getRepositoryToken(TagEntity),
     );
-    tagService = module.get<TagService>(TagService);
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -76,29 +61,20 @@ describe('TagController (e2e)', () => {
   });
 
   describe('/tag/all (GET)', () => {
-    const limit = 5;
-    let tags: TagEntity[];
-    let normalResult: TagDescriptionDto[];
-    let adultResult: TagDescriptionDto[];
+    let tags: any[];
+    let normalResult: Record<string, any>;
+    let adultResult: Record<string, any>;
 
     beforeAll(async () => {
-      tags = await tagService.findAll(null, {
-        limit,
-      });
+      tags = [testTag];
+      normalResult = instanceToPlain(
+        tags.map((item) => new TagDescriptionDto(item)),
+      );
 
-      normalResult = tags.map((item) => {
-        const { ...obj } = plainToInstance(TagDescriptionDto, item);
-        return obj;
-      });
-
-      tags = await tagService.findAll(adultProfile, {
-        limit,
-      });
-
-      adultResult = tags.map((item) => {
-        const { ...obj } = plainToInstance(TagDescriptionDto, item);
-        return obj;
-      });
+      tags = [testTag, testAdultTag];
+      adultResult = instanceToPlain(
+        tags.map((item) => new TagDescriptionDto(item)),
+      );
     });
 
     test('200', () => {
@@ -127,30 +103,18 @@ describe('TagController (e2e)', () => {
     const limit = 5;
     const _s = '테스트 캐릭터';
     const s = encodeURIComponent(_s);
-    let tags: TagEntity[];
-    let normalResult: TagResultDto[];
-    let adultResult: TagResultDto[];
+    let tags: any[];
+    let normalResult: Record<string, any>;
+    let adultResult: Record<string, any>;
 
     beforeAll(async () => {
-      tags = await tagService.find(null, {
-        s: _s,
-        limit,
-      });
+      tags = [testTag];
+      normalResult = instanceToPlain(
+        tags.map((item) => new TagResultDto(item)),
+      );
 
-      normalResult = tags.map((item) => {
-        const { ...obj } = plainToInstance(TagResultDto, item);
-        return obj;
-      });
-
-      tags = await tagService.find(adultProfile, {
-        s: _s,
-        limit,
-      });
-
-      adultResult = tags.map((item) => {
-        const { ...obj } = plainToInstance(TagResultDto, item);
-        return obj;
-      });
+      tags = [testTag, testAdultTag];
+      adultResult = instanceToPlain(tags.map((item) => new TagResultDto(item)));
     });
 
     test('200', () => {
@@ -180,8 +144,8 @@ describe('TagController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await tagRepository.delete(testTag.seq);
-    await tagRepository.delete(testAdultTag.seq);
+    await tagRepository.remove(testTag);
+    await tagRepository.remove(testAdultTag);
     await app.close();
     await module.close();
   });
