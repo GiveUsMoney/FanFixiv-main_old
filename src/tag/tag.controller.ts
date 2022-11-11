@@ -6,7 +6,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Profile } from '@src/common/decorator/user.decorator';
-import { UserProfile } from '@src/dto/user.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 import {
   LimitDto,
   TagDescriptionDto,

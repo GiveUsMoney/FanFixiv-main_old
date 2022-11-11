@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { api } from '../utils/api';
-import { UserInfo, UserProfile } from '@src/dto/user.dto';
+import { UserInfo, UserProfile } from '@src/interfaces/user.interface';
 import { config } from 'dotenv';
 
 config({

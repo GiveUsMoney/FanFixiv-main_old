@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { Profile, User } from '@src/common/decorator/user.decorator';
 import { ContentDto, ContentResultDto } from '@src/dto/content.dto';
-import { UserProfile } from '@src/dto/user.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 import { ContentService } from './content.service';
 
 /**
@@ -32,12 +32,12 @@ export class ContentController {
     @Profile() profile: UserProfile | null,
     @Query() dto: ContentDto,
   ): Promise<ContentResultDto> {
-    const [contents, count] = await this.contentService.getContent(
+    const [content, count] = await this.contentService.getContent(
       user,
       profile,
       dto,
     );
-    const page = Math.ceil(count / dto.count);
-    return new ContentResultDto(page, contents);
+    const pageCount = Math.ceil(count / dto.count);
+    return new ContentResultDto({ pageCount, content });
   }
 }

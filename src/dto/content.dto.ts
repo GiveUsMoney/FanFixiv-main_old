@@ -1,12 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ContentEntity } from '@src/entities/content.entity';
 import { Content } from '@src/interfaces/content.interface';
-import { Exclude, Expose, plainToInstance, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { IsInt, Min } from '@src/common/validator';
 import { TagResultDto } from './tag.dto';
 import { IsOptional } from 'class-validator';
+import { BaseDto } from './base.dto';
 
-export class ContentDto {
+export class ContentDto extends BaseDto {
   @IsInt()
   @Min(1)
   @Transform((x) => parseInt(x.value))
@@ -38,11 +38,13 @@ export class ContentDto {
 }
 
 @Exclude()
-export class ContentCardDto implements Content {
-  constructor(content: ContentEntity) {
-    Object.assign(this, content);
-    this.tags = plainToInstance(TagResultDto, content.tags);
-  }
+export class ContentCardDto extends BaseDto implements Content {
+  @Expose()
+  @ApiProperty({
+    type: Number,
+    description: '고유 아이디',
+  })
+  seq: number;
 
   @Expose()
   @ApiProperty({
@@ -77,6 +79,7 @@ export class ContentCardDto implements Content {
     type: Number,
     description: '좋아요 개수',
   })
+  @Transform(({ value }) => parseInt(value))
   like: number;
 
   @Expose()
@@ -89,6 +92,7 @@ export class ContentCardDto implements Content {
   translateReview: string;
 
   @Expose()
+  @Type(() => TagResultDto)
   @ApiProperty({
     type: [TagResultDto],
     description: '태그 목록',
@@ -96,18 +100,14 @@ export class ContentCardDto implements Content {
   tags: TagResultDto[];
 }
 
-export class ContentResultDto {
-  constructor(pageCount: number, content: ContentEntity[]) {
-    this.pageCount = pageCount;
-    this.content = content.map((item) => new ContentCardDto(item));
-  }
-
+export class ContentResultDto extends BaseDto {
   @ApiProperty({
     type: Number,
     description: '총 페이지 개수',
   })
   pageCount: number;
 
+  @Type(() => ContentCardDto)
   @ApiProperty({
     type: [ContentCardDto],
     description: '컨텐츠 카드 목록',

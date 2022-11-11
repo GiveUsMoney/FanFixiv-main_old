@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ContentEntity } from '@src/entities/content.entity';
 import { ContentDto } from '@src/dto/content.dto';
 import { Repository } from 'typeorm';
-import { UserProfile } from '@src/dto/user.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 import { TagEntity } from '@src/entities/tag.entity';
 import { TagTypes } from '@src/interfaces/tag.interface';
 import { LikesEntity } from '@src/entities/likes.entity';
@@ -72,10 +72,10 @@ export class ContentService {
         'content_do_like',
       )
       .leftJoinAndSelect('content.tags', 'tag')
-      .andWhere(
-        `not content."is_adult" 
+      .where(
+        `(not content."is_adult" 
         or (
-          content."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18)`,
+          content."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
         {
           birth: profile?.birth ?? '3000-01-01',
         },
@@ -105,11 +105,10 @@ export class ContentService {
       }
     }
 
-    content = content
-      .orderBy('content_created_at', 'DESC')
-      .limit(count)
-      .skip(skip);
+    content = content.orderBy('content_created_at', 'DESC');
 
-    return content.getManyAndCount();
+    const result = await content.getMany();
+
+    return [result.slice(skip, skip + count), result.length];
   }
 }

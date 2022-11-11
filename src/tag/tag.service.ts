@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
 import { LimitDto, TagDto } from '@src/dto/tag.dto';
 import { Repository } from 'typeorm';
-import { UserProfile } from '@src/dto/user.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 
 @Injectable()
 export class TagService {

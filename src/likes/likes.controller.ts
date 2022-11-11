@@ -4,7 +4,7 @@ import { Roles } from '@src/common/decorator/roles.decorator';
 import { Profile, User } from '@src/common/decorator/user.decorator';
 import { Role } from '@src/common/enum/roles.enum';
 import { LikeResultDto } from '@src/dto/likes.dto';
-import { UserProfile } from '@src/dto/user.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 import { LikesService } from './like.service';
 
 @ApiTags('likes')
