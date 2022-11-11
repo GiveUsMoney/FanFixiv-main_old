@@ -1,15 +1,8 @@
-import {
-  Controller,
-  Param,
-  ParseIntPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@src/common/decorator/roles.decorator';
 import { Profile, User } from '@src/common/decorator/user.decorator';
 import { Role } from '@src/common/enum/roles.enum';
-import { JwtAuthGuard } from '@src/common/guard/jwt-auth.guard';
 import { LikeResultDto } from '@src/dto/likes.dto';
 import { UserProfile } from '@src/dto/user.dto';
 import { LikesService } from './like.service';
@@ -21,7 +14,6 @@ export class LikesController {
 
   @Post(':content')
   @Roles(Role.USER)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async doLike(
     @User() userSeq: number,

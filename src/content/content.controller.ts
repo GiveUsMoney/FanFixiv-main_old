@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { Query, UseGuards } from '@nestjs/common/decorators';
+import { Query } from '@nestjs/common/decorators';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -7,7 +7,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Profile, User } from '@src/common/decorator/user.decorator';
-import { JwtAuthGuard } from '@src/common/guard/jwt-auth.guard';
 import { ContentDto, ContentResultDto } from '@src/dto/content.dto';
 import { UserProfile } from '@src/dto/user.dto';
 import { ContentService } from './content.service';
@@ -23,7 +22,6 @@ export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiQuery({
     type: ContentDto,
