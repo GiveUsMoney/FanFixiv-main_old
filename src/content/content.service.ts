@@ -43,7 +43,7 @@ export class ContentService {
     profile: UserProfile | null,
     dto: ContentDto,
   ): Promise<[ContentEntity[], number]> {
-    if (!this.EXTAR_TAGS) await this.setExtraTags();
+    if (this.EXTAR_TAGS.length == 0) await this.setExtraTags();
 
     const { count, page } = dto;
     const tags = dto.tags ?? [];
