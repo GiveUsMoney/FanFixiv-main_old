@@ -82,6 +82,8 @@ describe('TagController (e2e)', () => {
     let adultResult: Record<string, any>;
 
     beforeAll(async () => {
+      console.log(await tagRepository.find());
+
       tags = [testTag];
       normalResult = instanceToPlain(
         tags.map((item) => new TagDescriptionDto(item)),
@@ -162,6 +164,7 @@ describe('TagController (e2e)', () => {
   afterAll(async () => {
     await tagRepository.remove(testTag);
     await tagRepository.remove(testAdultTag);
+
     await app.close();
     await module.close();
   });
