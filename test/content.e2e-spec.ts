@@ -1,14 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@src/app.module';
 import { ContentEntity } from '@src/entities/content.entity';
 import { Repository } from 'typeorm';
 import { TagEntity } from '@src/entities/tag.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { TagTypes } from '@src/interfaces/tag.interface';
 import { instanceToPlain } from 'class-transformer';
 import { ContentCardDto, ContentResultDto } from '@src/dto/content.dto';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmConfigService } from '@src/config/db.config';
+import { ContentModule } from '@src/content/content.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 describe('ContentController (e2e)', () => {
   let app: INestApplication;
@@ -27,8 +34,21 @@ describe('ContentController (e2e)', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: `.env.${process.env.NODE_ENV}`,
+        }),
+        TypeOrmModule.forRootAsync({
+          useClass: TypeOrmConfigService,
+        }),
+        ContentModule,
+      ],
       providers: [
+        {
+          provide: APP_INTERCEPTOR,
+          useClass: ClassSerializerInterceptor,
+        },
         {
           provide: getRepositoryToken(TagEntity),
           useClass: Repository<TagEntity>,
@@ -132,25 +152,25 @@ describe('ContentController (e2e)', () => {
 
     let resultPaging: Record<string, any>;
 
+    function contentToPlain(contents: ContentEntity[]) {
+      const plain = instanceToPlain(
+        contents.map((x) => {
+          const content = new ContentCardDto(x);
+          content.like = 0;
+          content.doLike = false;
+          return content;
+        }),
+      );
+      plain.map((x: Record<string, any>) => {
+        x.createdAt = (x.createdAt as Date).toISOString();
+        return x;
+      });
+      return plain;
+    }
+
     beforeAll(async () => {
       seq1 = testTag1.seq;
       seq2 = testTag2.seq;
-
-      function contentToPlain(contents: ContentEntity[]) {
-        const plain = instanceToPlain(
-          contents.map((x) => {
-            const content = new ContentCardDto(x);
-            content.like = 0;
-            content.doLike = false;
-            return content;
-          }),
-        );
-        plain.map((x: Record<string, any>) => {
-          x.createdAt = (x.createdAt as Date).toISOString();
-          return x;
-        });
-        return plain;
-      }
 
       contents = [contentWith12, contentWith2, contentWith1];
       const cardTag = contentToPlain(contents);

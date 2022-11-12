@@ -1,14 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { ClassSerializerInterceptor, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
 import { TagEntity } from '@src/entities/tag.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { AppModule } from '@src/app.module';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { TagTypes } from '@src/interfaces/tag.interface';
-import { TagDescriptionDto, TagResultDto } from '@src/dto/tag.dto';
 import { ValidationPipe } from '@nestjs/common/pipes';
+import { TypeOrmConfigService } from '@src/config/db.config';
+import { TagModule } from '@src/tag/tag.module';
+import { ConfigModule } from '@nestjs/config';
 import { instanceToPlain } from 'class-transformer';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TagDescriptionDto, TagResultDto } from '@src/dto/tag.dto';
 
 describe('TagController (e2e)', () => {
   let app: INestApplication;
@@ -21,8 +24,21 @@ describe('TagController (e2e)', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: `.env.${process.env.NODE_ENV}`,
+        }),
+        TypeOrmModule.forRootAsync({
+          useClass: TypeOrmConfigService,
+        }),
+        TagModule,
+      ],
       providers: [
+        {
+          provide: APP_INTERCEPTOR,
+          useClass: ClassSerializerInterceptor,
+        },
         {
           provide: getRepositoryToken(TagEntity),
           useClass: Repository<TagEntity>,
