@@ -9,28 +9,51 @@ import { ContentEntity } from '@src/entities/content.entity';
 import { Repository } from 'typeorm';
 import { TagEntity } from '@src/entities/tag.entity';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { TagTypes } from '@src/interfaces/tag.interface';
+import { ExtraTagTypes, TagTypes } from '@src/interfaces/tag.interface';
 import { instanceToPlain } from 'class-transformer';
 import { ContentCardDto, ContentResultDto } from '@src/dto/content.dto';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmConfigService } from '@src/config/db.config';
 import { ContentModule } from '@src/content/content.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { LikesModule } from '@src/likes/like.module';
+import { JwtAuthGuard } from '@src/common/guard/jwt-auth.guard';
+import { JwtStrategy } from '@src/common/strategy/jwt.strategy';
+import { LikesEntity } from '@src/entities/likes.entity';
 
-describe('ContentController (e2e)', () => {
+describe('ContentController, LikesController (e2e)', () => {
   let app: INestApplication;
   let module: TestingModule;
 
   let tagRepository: Repository<TagEntity>;
   let contentRepository: Repository<ContentEntity>;
+  let likesRepository: Repository<LikesEntity>;
 
   let testTag1: TagEntity;
   let testTag2: TagEntity;
+  let testTagPop: TagEntity;
+  let testTagLike: TagEntity;
 
   let contentWith1: ContentEntity;
   let contentWith2: ContentEntity;
   let contentWith12: ContentEntity;
   let contentWith12Adult: ContentEntity;
+
+  function contentToPlain(contents: ContentEntity[], like?: number) {
+    const plain = instanceToPlain(
+      contents.map((x) => {
+        const content = new ContentCardDto(x);
+        content.like = like ?? 0;
+        content.doLike = !!like;
+        return content;
+      }),
+    );
+    plain.map((x: Record<string, any>) => {
+      x.createdAt = (x.createdAt as Date).toISOString();
+      return x;
+    });
+    return plain;
+  }
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -43,11 +66,17 @@ describe('ContentController (e2e)', () => {
           useClass: TypeOrmConfigService,
         }),
         ContentModule,
+        LikesModule,
       ],
       providers: [
+        JwtStrategy,
         {
           provide: APP_INTERCEPTOR,
           useClass: ClassSerializerInterceptor,
+        },
+        {
+          provide: APP_GUARD,
+          useClass: JwtAuthGuard,
         },
         {
           provide: getRepositoryToken(TagEntity),
@@ -56,6 +85,10 @@ describe('ContentController (e2e)', () => {
         {
           provide: getRepositoryToken(ContentEntity),
           useClass: Repository<ContentEntity>,
+        },
+        {
+          provide: getRepositoryToken(LikesEntity),
+          useClass: Repository<LikesEntity>,
         },
       ],
     }).compile();
@@ -67,6 +100,9 @@ describe('ContentController (e2e)', () => {
     );
     contentRepository = module.get<Repository<ContentEntity>>(
       getRepositoryToken(ContentEntity),
+    );
+    likesRepository = module.get<Repository<LikesEntity>>(
+      getRepositoryToken(LikesEntity),
     );
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
@@ -90,6 +126,28 @@ describe('ContentController (e2e)', () => {
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
+      }),
+    );
+
+    testTagPop = await tagRepository.save(
+      new TagEntity({
+        type: TagTypes.EXTRA,
+        name: '인기',
+        description: '좋아요 5 이상의 태그',
+        status: true,
+        isAdult: false,
+        extraTag: ExtraTagTypes.POPULARITY,
+      }),
+    );
+
+    testTagLike = await tagRepository.save(
+      new TagEntity({
+        type: TagTypes.EXTRA,
+        name: '좋아요',
+        description: '좋아요해 둔 태그',
+        status: true,
+        isAdult: false,
+        extraTag: ExtraTagTypes.LIKES,
       }),
     );
 
@@ -139,9 +197,6 @@ describe('ContentController (e2e)', () => {
   });
 
   describe('/content (GET)', () => {
-    let seq1: number;
-    let seq2: number;
-
     let contents: ContentEntity[];
 
     let result: Record<string, any>;
@@ -152,26 +207,12 @@ describe('ContentController (e2e)', () => {
 
     let resultPaging: Record<string, any>;
 
-    function contentToPlain(contents: ContentEntity[]) {
-      const plain = instanceToPlain(
-        contents.map((x) => {
-          const content = new ContentCardDto(x);
-          content.like = 0;
-          content.doLike = false;
-          return content;
-        }),
-      );
-      plain.map((x: Record<string, any>) => {
-        x.createdAt = (x.createdAt as Date).toISOString();
-        return x;
-      });
-      return plain;
-    }
+    let tagSeq1: number;
+    let tagSeq2: number;
 
     beforeAll(async () => {
-      seq1 = testTag1.seq;
-      seq2 = testTag2.seq;
-
+      tagSeq1 = testTag1.seq;
+      tagSeq2 = testTag2.seq;
       contents = [contentWith12, contentWith2, contentWith1];
       const cardTag = contentToPlain(contents);
       result = instanceToPlain(
@@ -236,29 +277,29 @@ describe('ContentController (e2e)', () => {
 
     test('200 (with Tag1)', () => {
       return request(app.getHttpServer())
-        .get(`/content?count=3&page=1&tags=${seq1}`)
+        .get(`/content?count=3&page=1&tags=${tagSeq1}`)
         .expect(200)
         .expect(result1);
     });
 
     test('200 (with Tag2)', () => {
       return request(app.getHttpServer())
-        .get(`/content?count=3&page=1&tags=${seq2}`)
+        .get(`/content?count=3&page=1&tags=${tagSeq2}`)
         .expect(200)
         .expect(result2);
     });
 
     test('200 (with Tag1 and Tag2)', () => {
       return request(app.getHttpServer())
-        .get(`/content?count=3&page=1&tags=${seq1},${seq2}`)
+        .get(`/content?count=3&page=1&tags=${tagSeq1},${tagSeq2}`)
         .expect(200)
         .expect(result12);
     });
 
     test('200 (adult)', () => {
       return request(app.getHttpServer())
-        .get(`/content?count=3&page=1&tags=${seq1},${seq2}`)
-        .set('Authorization', 'Bearer TESTTOKEN')
+        .get(`/content?count=3&page=1&tags=${tagSeq1},${tagSeq2}`)
+        .set('Authorization', 'Bearer ADULT')
         .expect(200)
         .expect(result12Adult);
     });
@@ -277,9 +318,95 @@ describe('ContentController (e2e)', () => {
     });
   });
 
+  describe('/content (GET) (EXTRA_TAG)', () => {
+    let result: Record<string, any>;
+
+    beforeAll(async () => {
+      for (let i = 0; i < 5; i++) {
+        await likesRepository.save(
+          new LikesEntity({
+            userSeq: 1,
+            content: contentWith1,
+          }),
+        );
+      }
+
+      const contents = [contentWith1];
+      const cardTagLike = contentToPlain(contents, 5);
+      result = instanceToPlain(
+        new ContentResultDto({
+          pageCount: 1,
+          content: cardTagLike,
+        }),
+      );
+    });
+
+    test('200 (LIKES)', () => {
+      return request(app.getHttpServer())
+        .get(`/content?count=1&page=1&tags=${testTagLike.seq}`)
+        .set('Authorization', 'Bearer ADULT')
+        .expect(200)
+        .expect(result);
+    });
+
+    test('200 (POP)', () => {
+      return request(app.getHttpServer())
+        .get(`/content?count=1&page=1&tags=${testTagPop.seq}`)
+        .set('Authorization', 'Bearer ADULT')
+        .expect(200)
+        .expect(result);
+    });
+  });
+
+  describe('/like (POST)', () => {
+    let result: Record<string, any>;
+    let contentSeq: number;
+
+    let tagSeq1: number;
+    let tagSeq2: number;
+
+    beforeAll(async () => {
+      contentSeq = contentWith12.seq;
+      tagSeq1 = testTag1.seq;
+      tagSeq2 = testTag2.seq;
+
+      const contents = [contentWith12];
+      const cardTag12 = contentToPlain(contents, 1);
+      result = instanceToPlain(
+        new ContentResultDto({
+          pageCount: 1,
+          content: cardTag12,
+        }),
+      );
+    });
+
+    test('200', async () => {
+      await request(app.getHttpServer())
+        .post(`/likes/${contentSeq}`)
+        .set('Authorization', 'Bearer ADULT')
+        .expect(200)
+        .expect({ like: 1 });
+      await request(app.getHttpServer())
+        .get(`/content?count=1&page=1&tags=${tagSeq1},${tagSeq2}`)
+        .expect(200)
+        .expect(result);
+      await request(app.getHttpServer())
+        .post(`/likes/${contentSeq}`)
+        .set('Authorization', 'Bearer ADULT')
+        .expect(200)
+        .expect({ like: 0 });
+    });
+
+    test('400', () => {
+      return request(app.getHttpServer()).post(`/likes/0`).expect(400);
+    });
+  });
+
   afterAll(async () => {
     await tagRepository.remove(testTag1);
     await tagRepository.remove(testTag2);
+    await tagRepository.remove(testTagPop);
+    await tagRepository.remove(testTagLike);
     await contentRepository.remove(contentWith1);
     await contentRepository.remove(contentWith2);
     await contentRepository.remove(contentWith12);

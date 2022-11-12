@@ -15,20 +15,18 @@ export class ContentService {
     private contentRepository: Repository<ContentEntity>,
     @InjectRepository(TagEntity)
     private tagRepository: Repository<TagEntity>,
-  ) {
-    this.tagRepository
-      .find({
-        select: ['seq', 'extraTag'],
-        where: {
-          type: TagTypes.EXTRA,
-        },
-      })
-      .then((tags) => {
-        this.EXTAR_TAGS = tags;
-      });
-  }
+  ) {}
 
   private EXTAR_TAGS: TagEntity[] = [];
+
+  async setExtraTags() {
+    this.EXTAR_TAGS = await this.tagRepository.find({
+      select: ['seq', 'extraTag'],
+      where: {
+        type: TagTypes.EXTRA,
+      },
+    });
+  }
 
   /**
    * @param user 사용자 고유번호
@@ -45,6 +43,8 @@ export class ContentService {
     profile: UserProfile | null,
     dto: ContentDto,
   ): Promise<[ContentEntity[], number]> {
+    if (!this.EXTAR_TAGS) await this.setExtraTags();
+
     const { count, page } = dto;
     const tags = dto.tags ?? [];
     const skip = count * (page - 1);

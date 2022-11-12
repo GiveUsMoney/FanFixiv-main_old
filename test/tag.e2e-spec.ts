@@ -120,7 +120,7 @@ describe('TagController (e2e)', () => {
     test('200 (adult)', () => {
       return request(app.getHttpServer())
         .get(`/tag/all?limit=${5}`)
-        .set('Authorization', 'Bearer TESTTOKEN')
+        .set('Authorization', 'Bearer ADULT')
         .expect(200)
         .expect(adultResult);
     });
