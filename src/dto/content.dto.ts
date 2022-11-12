@@ -5,6 +5,7 @@ import { IsInt, Min } from '@src/common/validator';
 import { TagResultDto } from './tag.dto';
 import { IsOptional } from 'class-validator';
 import { BaseDto } from './base.dto';
+import { Likes } from '@src/interfaces/likes.interface';
 
 export class ContentDto extends BaseDto {
   @IsInt()
@@ -98,6 +99,8 @@ export class ContentCardDto extends BaseDto implements Content {
     description: '태그 목록',
   })
   tags: TagResultDto[];
+
+  likes: Likes[];
 }
 
 export class ContentResultDto extends BaseDto {

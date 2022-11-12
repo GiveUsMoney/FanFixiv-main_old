@@ -24,18 +24,32 @@ export const Profile = createParamDecorator(
     if (authorization == null) return null;
 
     if (process.env.NODE_ENV === 'test') {
-      return new Promise<UserProfile>((res) => {
-        res({
-          email: 'example@example.com',
-          nickname: 'test',
-          profile_img: null,
-          descript: 'test',
+      if (authorization == 'Bearer ADULT')
+        return new Promise<UserProfile>((res) => {
+          res({
+            email: 'example@example.com',
+            nickname: 'test',
+            profile_img: null,
+            descript: 'test',
 
-          nn_md_date: '2022-10-17',
-          birth: '2000-01-01',
-          _tr: false,
-        } as UserProfile);
-      });
+            nn_md_date: '2022-10-17',
+            birth: '2000-01-01',
+            _tr: false,
+          } as UserProfile);
+        });
+      else if (authorization == 'Bearer CHILD')
+        return new Promise<UserProfile>((res) => {
+          res({
+            email: 'example@example.com',
+            nickname: 'test',
+            profile_img: null,
+            descript: 'test',
+
+            nn_md_date: '2022-10-17',
+            birth: '3000-01-01',
+            _tr: false,
+          } as UserProfile);
+        });
     }
 
     return api<UserProfile>(process.env.USER_SERVER + '/profile', {

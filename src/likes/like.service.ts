@@ -41,30 +41,37 @@ export class LikesService {
       );
     }
 
-    const like = await this.likesRepository.findOne({
+    const _like = await this.likesRepository.findOne({
+      relations: ['content'],
       where: {
         userSeq,
-        contentSeq,
+        content: {
+          seq: contentSeq,
+        },
       },
     });
 
-    if (!like) {
+    if (!_like) {
       await this.likesRepository.save(
         new LikesEntity({
           userSeq,
-          contentSeq,
+          content,
         }),
       );
     } else {
-      await this.likesRepository.remove(like);
+      await this.likesRepository.remove(_like);
     }
 
-    const likes = await this.likesRepository.count({
+    const like = await this.likesRepository.count({
+      relations: ['content'],
       where: {
-        contentSeq,
+        userSeq,
+        content: {
+          seq: contentSeq,
+        },
       },
     });
 
-    return new LikeResultDto(likes);
+    return new LikeResultDto({ like });
   }
 }

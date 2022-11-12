@@ -1,4 +1,6 @@
+import { Content } from './content.interface';
+
 export interface Likes {
   userSeq: number;
-  contentSeq: number;
+  content: Content;
 }

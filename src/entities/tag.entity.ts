@@ -1,4 +1,4 @@
-import { Tag, TagTypes } from '@src/interfaces/tag.interface';
+import { ExtraTagTypes, Tag, TagTypes } from '@src/interfaces/tag.interface';
 import { Entity, Column } from 'typeorm';
 import { BaseEntity } from './base.entity';
 
@@ -22,6 +22,14 @@ export class TagEntity extends BaseEntity implements Tag {
 
   @Column({ default: false })
   isAdult: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: ExtraTagTypes,
+    nullable: true,
+    default: null,
+  })
+  extraTag: ExtraTagTypes;
 }
 
 @Entity({ name: 'tb_type_name' })

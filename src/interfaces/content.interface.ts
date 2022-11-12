@@ -1,3 +1,4 @@
+import { Likes } from './likes.interface';
 import { Tag } from './tag.interface';
 
 export interface Content {
@@ -8,4 +9,5 @@ export interface Content {
   like: number;
   doLike: boolean;
   tags: Tag[];
+  likes: Likes[];
 }

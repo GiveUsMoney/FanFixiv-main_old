@@ -5,7 +5,7 @@ import { ContentDto } from '@src/dto/content.dto';
 import { Repository } from 'typeorm';
 import { UserProfile } from '@src/interfaces/user.interface';
 import { TagEntity } from '@src/entities/tag.entity';
-import { TagTypes } from '@src/interfaces/tag.interface';
+import { ExtraTagTypes, TagTypes } from '@src/interfaces/tag.interface';
 import { LikesEntity } from '@src/entities/likes.entity';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ContentService {
   ) {
     this.tagRepository
       .find({
-        select: ['seq', 'name'],
+        select: ['seq', 'extraTag'],
         where: {
           type: TagTypes.EXTRA,
         },
@@ -51,27 +51,32 @@ export class ContentService {
 
     let content = this.contentRepository
       .createQueryBuilder('content')
-      .addSelect(
-        (sub) =>
-          sub
-            .subQuery()
-            .select('COUNT(seq)')
-            .from(LikesEntity, 'like')
-            .where('like.content_seq = content.seq'),
-        'content_like',
-      )
-      .addSelect(
-        (sub) =>
-          sub
-            .subQuery()
-            .select('COUNT(seq) > 0')
-            .from(LikesEntity, 'like')
-            .where('like.content_seq = content.seq and like.user_seq = :user', {
-              user,
-            }),
-        'content_do_like',
-      )
       .leftJoinAndSelect('content.tags', 'tag')
+      .leftJoinAndSelect(
+        (sub) =>
+          sub
+            .subQuery()
+            .select('like.content_seq', 'like_content_seq')
+            .addSelect('COUNT(seq)', 'like')
+            .from(LikesEntity, 'like')
+            .groupBy('like.content_seq'),
+        'like',
+        '"like"."like_content_seq" = content.seq',
+      )
+      .leftJoinAndSelect(
+        (sub) =>
+          sub
+            .subQuery()
+            .select('like.content_seq', 'like_content_seq')
+            .addSelect('COUNT(seq) > 0', 'do_like')
+            .from(LikesEntity, 'like')
+            .where('like.user_seq = :user', { user })
+            .groupBy('like.content_seq'),
+        'do_like',
+        '"do_like"."like_content_seq" = content.seq',
+      )
+      .addSelect('COALESCE("like"."like", 0)', 'content_like')
+      .addSelect('COALESCE("do_like"."do_like", false)', 'content_do_like')
       .where(
         `(not content."is_adult" 
         or (
@@ -83,16 +88,16 @@ export class ContentService {
 
     if (tags.length != 0) {
       const exTagIndex = this.EXTAR_TAGS.map((x) => x.seq);
-      const nTags = tags.filter((x) => exTagIndex.indexOf(x) < 0);
-      const exTags = tags.filter((x) => exTagIndex.indexOf(x) >= 0);
+      const nTags = tags.filter((x) => !exTagIndex.includes(x));
+      const exTags = tags.filter((x) => exTagIndex.includes(x));
 
       if (nTags.length) {
         content = content.andWhere(
-          `"content_seq" in (
-            select "content_seq" from "tb_content_tag_reg"
+          `"content"."seq" in (
+            select "reg"."content_seq" from "tb_content_tag_reg" "reg"
             where "tag_seq" in (:...idx)
-            group by "content_seq"
-            having count("tag_seq") >= :len
+            group by "reg"."content_seq"
+            having count("reg"."tag_seq") >= :len
           )`,
           {
             idx: nTags,
@@ -101,7 +106,15 @@ export class ContentService {
         );
       }
       if (exTags.length != 0) {
-        // TODO: 엑스트라 태그 별로 로직이 필요.
+        const exTagTypes = exTags.map((idx) => {
+          return this.EXTAR_TAGS.find((x) => x.seq == idx).extraTag;
+        });
+        if (exTagTypes.includes(ExtraTagTypes.POPULARITY)) {
+          content = content.andWhere('"like"."like" >= 5');
+        }
+        if (exTagTypes.includes(ExtraTagTypes.LIKES)) {
+          content = content.andWhere('"do_like"."do_like"');
+        }
       }
     }
 

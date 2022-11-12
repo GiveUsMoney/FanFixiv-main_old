@@ -20,3 +20,8 @@ export enum TagTypes {
   LANGUAGE,
   EXTRA,
 }
+
+export enum ExtraTagTypes {
+  POPULARITY,
+  LIKES,
+}
