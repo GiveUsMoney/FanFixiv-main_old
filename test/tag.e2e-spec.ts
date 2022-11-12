@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ClassSerializerInterceptor, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
-import { TagEntity } from '@src/entities/tag.entity';
+import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { TagTypes } from '@src/interfaces/tag.interface';
 import { ValidationPipe } from '@nestjs/common/pipes';
@@ -18,9 +18,11 @@ describe('TagController (e2e)', () => {
   let module: TestingModule;
 
   let tagRepository: Repository<TagEntity>;
+  let tagNameRepository: Repository<TagNameEntity>;
 
   let testTag: TagEntity;
   let testAdultTag: TagEntity;
+  let testTagName: TagNameEntity;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -32,6 +34,7 @@ describe('TagController (e2e)', () => {
         TypeOrmModule.forRootAsync({
           useClass: TypeOrmConfigService,
         }),
+        TypeOrmModule.forFeature([TagNameEntity]),
         TagModule,
       ],
       providers: [
@@ -43,6 +46,10 @@ describe('TagController (e2e)', () => {
           provide: getRepositoryToken(TagEntity),
           useClass: Repository<TagEntity>,
         },
+        {
+          provide: getRepositoryToken(TagNameEntity),
+          useClass: Repository<TagNameEntity>,
+        },
       ],
     }).compile();
 
@@ -50,10 +57,20 @@ describe('TagController (e2e)', () => {
     tagRepository = module.get<Repository<TagEntity>>(
       getRepositoryToken(TagEntity),
     );
+    tagNameRepository = module.get<Repository<TagNameEntity>>(
+      getRepositoryToken(TagNameEntity),
+    );
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     await app.init();
+
+    testTagName = await tagNameRepository.save(
+      new TagNameEntity({
+        typeSeq: TagTypes.CHARACTOR,
+        typeName: '캐릭터',
+      }),
+    );
 
     testTag = await tagRepository.save(
       new TagEntity({
@@ -82,8 +99,6 @@ describe('TagController (e2e)', () => {
     let adultResult: Record<string, any>;
 
     beforeAll(async () => {
-      console.log(await tagRepository.find());
-
       tags = [testTag];
       normalResult = instanceToPlain(
         tags.map((item) => new TagDescriptionDto(item)),
@@ -164,6 +179,7 @@ describe('TagController (e2e)', () => {
   afterAll(async () => {
     await tagRepository.remove(testTag);
     await tagRepository.remove(testAdultTag);
+    await tagNameRepository.remove(testTagName);
 
     await app.close();
     await module.close();
