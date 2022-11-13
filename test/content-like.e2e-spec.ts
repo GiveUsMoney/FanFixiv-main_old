@@ -268,7 +268,7 @@ describe('ContentController, LikesController (e2e)', () => {
       );
     });
 
-    test('200', () => {
+    test('200 (no Tag)', () => {
       return request(app.getHttpServer())
         .get(`/content?count=3&page=1`)
         .expect(200)
@@ -296,7 +296,7 @@ describe('ContentController, LikesController (e2e)', () => {
         .expect(result12);
     });
 
-    test('200 (adult)', () => {
+    test('200 (Adult)', () => {
       return request(app.getHttpServer())
         .get(`/content?count=3&page=1&tags=${tagSeq1},${tagSeq2}`)
         .set('Authorization', 'Bearer ADULT')
@@ -304,7 +304,7 @@ describe('ContentController, LikesController (e2e)', () => {
         .expect(result12Adult);
     });
 
-    test('200 (paging)', () => {
+    test('200 (Paging)', () => {
       return request(app.getHttpServer())
         .get(`/content?count=1&page=2`)
         .expect(200)
