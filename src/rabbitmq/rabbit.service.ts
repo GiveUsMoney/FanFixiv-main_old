@@ -6,6 +6,8 @@ import { ProfileFormDto, ProfileFormResultDto } from '@src/dto/upload.dto';
 
 @Injectable()
 export class RabbitService {
+  private EXT_LIST = ['jpg', 'png'];
+
   @RabbitRPC({
     exchange: 'fanfixiv.main',
     routingKey: 'profile-img.form',
@@ -16,6 +18,12 @@ export class RabbitService {
   ): Promise<ProfileFormResultDto> {
     try {
       const realKey = dto.key.split('/').pop();
+
+      const [nameCheck, extCheck] = realKey.split('.');
+
+      if (!/[^0-9]/.test(nameCheck) || !this.EXT_LIST.includes(extCheck)) {
+        throw new Error('프로필 이미지 링크가 올바르지 않습니다.');
+      }
 
       await s3.send(
         new CopyObjectCommand({
