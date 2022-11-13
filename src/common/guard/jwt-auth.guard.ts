@@ -15,6 +15,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const contextType = context.getType<'http' | 'rmq'>();
+
+    if (contextType === 'rmq') return true;
+
     await super.canActivate(context);
     const roles = this.reflector.get<string[]>(ROLES_KEY, context.getHandler());
     const { user } = context.switchToHttp().getRequest<{ user: UserInfo }>();
