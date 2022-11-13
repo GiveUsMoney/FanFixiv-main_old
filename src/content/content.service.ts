@@ -28,6 +28,14 @@ export class ContentService {
     });
   }
 
+  snakeToCamel(str: string) {
+    return str
+      .toLowerCase()
+      .replace(/([-_][a-z])/g, (group) =>
+        group.toUpperCase().replace('-', '').replace('_', ''),
+      );
+  }
+
   /**
    * @param user 사용자 고유번호
    * @param profile IProfile
@@ -51,8 +59,51 @@ export class ContentService {
 
     let content = this.contentRepository
       .createQueryBuilder('content')
-      .leftJoinAndSelect('content.tags', 'tag')
       .leftJoinAndSelect(
+        (sub) =>
+          sub
+            .subQuery()
+            .select([
+              '"tmp"."seq" as "tag_seq"',
+              '"tmp"."c_seq" as "c_seq"',
+              '"tmp"."count_rank" as "count_rank"',
+              '"tmp"."type" as "tag_type"',
+              '"tmp"."name" as "tag_name"',
+            ])
+            .from(
+              (sub) =>
+                sub
+                  .subQuery()
+                  .select('"reg"."content_seq"', 'c_seq')
+                  .addSelect(
+                    `rank() 
+                    over(partition by reg.content_seq order by tag_count.count desc, tag_count.seq asc)
+                    `,
+                    'count_rank',
+                  )
+                  .from('tb_content_tag_reg', 'reg')
+                  .leftJoinAndSelect(
+                    (sub) =>
+                      sub
+                        .select('"tag".*')
+                        .addSelect('count(tag.seq) as count')
+                        .from(TagEntity, 'tag')
+                        .innerJoin(
+                          'tb_content_tag_reg',
+                          'reg',
+                          '"reg"."tag_seq" = "tag"."seq"',
+                        )
+                        .groupBy('"tag"."seq"'),
+                    'tag_count',
+                    '"tag_count"."seq" = "reg"."tag_seq"',
+                  ),
+              'tmp',
+            )
+            .where('"tmp"."count_rank" <= 3'),
+        'tag',
+        '"tag"."c_seq" = "content"."seq"',
+      )
+      .leftJoin(
         (sub) =>
           sub
             .subQuery()
@@ -63,7 +114,7 @@ export class ContentService {
         'like',
         '"like"."like_content_seq" = content.seq',
       )
-      .leftJoinAndSelect(
+      .leftJoin(
         (sub) =>
           sub
             .subQuery()
@@ -118,9 +169,34 @@ export class ContentService {
       }
     }
 
-    content = content.orderBy('content_created_at', 'DESC');
+    content = content
+      .orderBy('content_created_at', 'DESC')
+      .addOrderBy('"tag"."count_rank"', 'ASC')
+      .addOrderBy('"tag"."tag_seq"', 'ASC');
 
-    const result = await content.getMany();
+    const rawResult = await content.getRawMany();
+
+    const result = rawResult.reduce((act, cur) => {
+      const r = Object.entries(cur).reduce(
+        (o, [k, v]) => {
+          if (k.includes('content_')) {
+            o[this.snakeToCamel(k.replace('content_', ''))] = v;
+          } else if (k.includes('tag_')) {
+            o.tags[0][this.snakeToCamel(k.replace('tag_', ''))] = v;
+          }
+          return o;
+        },
+        { tags: [{}] } as any,
+      );
+      const x = act.find((x) => x.seq == r.seq);
+
+      if (x == undefined) {
+        act.push(r);
+      } else {
+        x.tags.push(r.tags[0]);
+      }
+      return act;
+    }, []);
 
     return [result.slice(skip, skip + count), result.length];
   }
