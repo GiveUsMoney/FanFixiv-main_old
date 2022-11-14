@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString, IsUrl } from '@src/common/validator';
+import { IsBoolean, IsEnum, IsString, IsUrl } from '@src/common/validator';
 import { TagRequest, TagTypes } from '@src/interfaces/tag.interface';
 import { IsOptional } from 'class-validator';
 import { BaseDto } from './base.dto';
@@ -25,6 +25,14 @@ export class TagRequestDto extends BaseDto implements TagRequest {
     description: '태그에 대한 설명',
   })
   description: string;
+
+  @IsBoolean()
+  @ApiProperty({
+    type: Boolean,
+    description: '성인 태그 여부',
+    default: false,
+  })
+  isAdult = false;
 
   @IsUrl({}, { each: true })
   @IsOptional()

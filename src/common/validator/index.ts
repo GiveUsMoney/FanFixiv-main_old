@@ -4,6 +4,7 @@ import {
   Min as _Min,
   IsUrl as _IsUrl,
   IsEnum as _IsEnum,
+  IsBoolean as _IsBoolean,
   ValidationOptions,
 } from 'class-validator';
 import ValidatorJS from 'validator';
@@ -17,6 +18,12 @@ export const IsString = (validationOptions?: ValidationOptions) =>
 export const IsInt = (validationOptions?: ValidationOptions) =>
   _IsInt({
     message: '$property가 int형이 아닙니다.',
+    ...validationOptions,
+  });
+
+export const IsBoolean = (validationOptions?: ValidationOptions) =>
+  _IsBoolean({
+    message: '$property가 boolean형이 아닙니다.',
     ...validationOptions,
   });
 

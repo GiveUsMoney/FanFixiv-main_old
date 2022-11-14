@@ -11,6 +11,7 @@ export interface TagRequest {
   type: TagTypes;
   name: string;
   description: string;
+  isAdult?: boolean;
   artistProfile?: string[];
 }
 
