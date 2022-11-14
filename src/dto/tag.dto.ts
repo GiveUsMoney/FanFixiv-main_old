@@ -12,6 +12,7 @@ export class LimitDto extends BaseDto {
   @ApiProperty({
     type: Number,
     description: '태그 표시 개수',
+    required: false,
   })
   limit: number;
 }
@@ -60,6 +61,8 @@ export class TagResultDto extends BaseDto implements Tag {
   status: boolean;
 
   isAdult: boolean;
+
+  requester: number;
 }
 
 @Exclude()
@@ -90,4 +93,6 @@ export class TagDescriptionDto extends TagResultDto implements Tag {
   status: boolean;
 
   isAdult: boolean;
+
+  requester: number;
 }
