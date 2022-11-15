@@ -1,6 +1,7 @@
 import { ExtraTagTypes, Tag, TagTypes } from '@src/interfaces/tag.interface';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { ContentEntity } from './content.entity';
 
 @Entity({ name: 'tb_tag' })
 export class TagEntity extends BaseEntity implements Tag {
@@ -30,6 +31,9 @@ export class TagEntity extends BaseEntity implements Tag {
     default: null,
   })
   extraTag: ExtraTagTypes;
+
+  @OneToMany(() => ContentEntity, (content) => content.artist)
+  work: ContentEntity[];
 }
 
 @Entity({ name: 'tb_type_name' })

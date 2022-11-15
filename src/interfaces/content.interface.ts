@@ -8,6 +8,7 @@ export interface Content {
   isAdult: boolean;
   like: number;
   doLike: boolean;
+  artist: Tag;
   tags: Tag[];
   likes: Likes[];
 }

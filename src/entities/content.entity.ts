@@ -1,5 +1,12 @@
 import { Content } from '@src/interfaces/content.interface';
-import { Entity, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { LikesEntity } from './likes.entity';
 import { TagEntity } from './tag.entity';
@@ -25,6 +32,9 @@ export class ContentEntity extends BaseEntity implements Content {
   // typeorm의 .addSelectAndMap 기능이 현재 존재하지 않아 있는 임시 컬럼...
   @Column({ select: false, nullable: true, insert: false, update: false })
   doLike: boolean;
+
+  @ManyToOne(() => TagEntity, (tag) => tag.work)
+  artist: TagEntity;
 
   @ManyToMany(() => TagEntity)
   @JoinTable({

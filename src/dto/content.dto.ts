@@ -100,6 +100,14 @@ export class ContentCardDto extends BaseDto implements Content {
   })
   tags: TagResultDto[];
 
+  @Expose()
+  @Type(() => TagResultDto)
+  @ApiProperty({
+    type: TagResultDto,
+    description: '작가 태그',
+  })
+  artist: TagResultDto;
+
   likes: Likes[];
 }
 
