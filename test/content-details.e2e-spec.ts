@@ -5,50 +5,50 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import * as request from 'supertest';
-import { ContentEntity } from '@src/entities/content.entity';
+import {
+  ContentEntity,
+  ContentSourceEntity,
+} from '@src/entities/content.entity';
 import { Repository } from 'typeorm';
 import { TagEntity } from '@src/entities/tag.entity';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { TagTypes } from '@src/interfaces/tag.interface';
 import { instanceToPlain } from 'class-transformer';
-import { ContentCardDto, ContentResultDto } from '@src/dto/content.dto';
+import { ContentDetailDto } from '@src/dto/content.dto';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmConfigService } from '@src/config/db.config';
 import { ContentModule } from '@src/content/content.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from '@src/common/guard/jwt-auth.guard';
 import { JwtStrategy } from '@src/common/strategy/jwt.strategy';
+import { SeriesEntity } from '@src/entities/series.entity';
+import { SourceType } from '@src/interfaces/content.interface';
 
-describe('ContentController - Tag (e2e)', () => {
+describe('ContentController - details (e2e)', () => {
   let app: INestApplication;
   let module: TestingModule;
 
   let tagRepository: Repository<TagEntity>;
   let contentRepository: Repository<ContentEntity>;
+  let contentSourceRepository: Repository<ContentSourceEntity>;
+  let seriesRepository: Repository<SeriesEntity>;
 
-  let testTag1: TagEntity;
-  let testTag2: TagEntity;
-  let testTag3: TagEntity;
-  let testTag4: TagEntity;
-  let testArtistTag: TagEntity;
+  let testTag: TagEntity;
+  let testTagArtist: TagEntity;
 
-  let contentWith1: ContentEntity;
-  let contentWith2: ContentEntity;
+  let contentSource: ContentSourceEntity;
 
-  function contentToPlain(contents: ContentEntity[], tags: TagEntity[]) {
-    const plain = instanceToPlain(
-      contents.map((x) => {
-        const content = new ContentCardDto(x);
-        content.like = 0;
-        content.doLike = false;
-        content.tags = tags;
-        return content;
-      }),
-    );
-    plain.map((x: Record<string, any>) => {
-      x.createdAt = (x.createdAt as Date).toISOString();
-      return x;
-    });
+  let series: SeriesEntity;
+
+  let content: ContentEntity;
+  let contentStatusFalse: ContentEntity;
+
+  function contentToPlain(cnt: ContentEntity) {
+    const c = new ContentDetailDto(cnt);
+    c.like = 0;
+    c.doLike = false;
+    const plain = instanceToPlain(c);
+    plain.createdAt = (plain.createdAt as Date).toISOString();
     return plain;
   }
 
@@ -62,6 +62,7 @@ describe('ContentController - Tag (e2e)', () => {
         TypeOrmModule.forRootAsync({
           useClass: TypeOrmConfigService,
         }),
+        TypeOrmModule.forFeature([SeriesEntity, ContentSourceEntity]),
         ContentModule,
       ],
       providers: [
@@ -82,6 +83,14 @@ describe('ContentController - Tag (e2e)', () => {
           provide: getRepositoryToken(ContentEntity),
           useClass: Repository<ContentEntity>,
         },
+        {
+          provide: getRepositoryToken(ContentSourceEntity),
+          useClass: Repository<ContentSourceEntity>,
+        },
+        {
+          provide: getRepositoryToken(SeriesEntity),
+          useClass: Repository<SeriesEntity>,
+        },
       ],
     }).compile();
 
@@ -93,12 +102,18 @@ describe('ContentController - Tag (e2e)', () => {
     contentRepository = module.get<Repository<ContentEntity>>(
       getRepositoryToken(ContentEntity),
     );
+    contentSourceRepository = module.get<Repository<ContentSourceEntity>>(
+      getRepositoryToken(ContentSourceEntity),
+    );
+    seriesRepository = module.get<Repository<SeriesEntity>>(
+      getRepositoryToken(SeriesEntity),
+    );
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     await app.init();
 
-    testArtistTag = await tagRepository.save(
+    testTagArtist = await tagRepository.save(
       new TagEntity({
         type: TagTypes.ARTIST,
         name: '테스트 작가',
@@ -108,109 +123,98 @@ describe('ContentController - Tag (e2e)', () => {
       }),
     );
 
-    testTag1 = await tagRepository.save(
+    testTag = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 1',
+        name: '테스트 캐릭터',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
       }),
     );
 
-    testTag2 = await tagRepository.save(
-      new TagEntity({
-        type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 2',
-        description: '테스트용 캐릭터입니다.',
-        status: true,
-        isAdult: false,
+    series = await seriesRepository.save(
+      new SeriesEntity({
+        title: '테스트 시리즈',
       }),
     );
 
-    testTag3 = await tagRepository.save(
-      new TagEntity({
-        type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 3',
-        description: '테스트용 캐릭터입니다.',
-        status: true,
-        isAdult: false,
+    contentSource = await contentSourceRepository.save(
+      new ContentSourceEntity({
+        type: SourceType.ARTIST,
+        link: 'http://example.com',
       }),
     );
 
-    testTag4 = await tagRepository.save(
-      new TagEntity({
-        type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 4',
-        description: '테스트용 캐릭터입니다.',
-        status: true,
-        isAdult: false,
-      }),
-    );
-
-    contentWith1 = await contentRepository.save(
-      new ContentEntity({
-        createdAt: new Date(),
-        title: '테스트 컨텐츠 1',
-        thumbnail: 'http://example.com/image.jpg',
-        isAdult: false,
-        translateReview: '번역 후기',
-        tags: [testTag1, testTag2, testTag3, testTag4],
-        status: true,
-        uploaderSeq: -1,
-        artist: testArtistTag,
-      }),
-    );
-
-    contentWith2 = await contentRepository.save(
+    contentStatusFalse = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
         title: '테스트 컨텐츠 2',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',
-        tags: [testTag3, testTag4],
+        tags: [testTagArtist, testTag],
+        series: series,
+        source: [contentSource],
+        status: false,
+        uploaderSeq: -1,
+      }),
+    );
+
+    content = await contentRepository.save(
+      new ContentEntity({
+        createdAt: new Date(),
+        title: '테스트 컨텐츠 1',
+        thumbnail: 'http://example.com/image.jpg',
+        isAdult: false,
+        translateReview: '번역 후기',
+        tags: [testTagArtist, testTag],
+        series: series,
+        source: [contentSource],
         status: true,
         uploaderSeq: -1,
-        artist: testArtistTag,
       }),
     );
   });
 
   describe('/content (GET)', () => {
-    let contents: ContentEntity[];
-
     let result: Record<string, any>;
 
-    let tagSeq2: number;
-
     beforeAll(async () => {
-      tagSeq2 = testTag2.seq;
-      contents = [contentWith1];
-      const cardTag = contentToPlain(contents, [testTag3, testTag4, testTag1]);
-      result = instanceToPlain(
-        new ContentResultDto({
-          pageCount: 1,
-          content: cardTag,
-        }),
-      );
+      result = contentToPlain(content);
     });
 
     test('200', () => {
       return request(app.getHttpServer())
-        .get(`/content?count=1&page=1&tags=${tagSeq2}`)
+        .get(`/content/${content.seq}`)
         .expect(200)
         .expect(result);
+    });
+
+    test('400 (NO SEQ)', () => {
+      return request(app.getHttpServer())
+        .get(`/content/${content.seq + 100}`)
+        .expect(400);
+    });
+
+    test('400 (Status False)', () => {
+      return request(app.getHttpServer())
+        .get(`/content/${contentStatusFalse.seq}`)
+        .expect(400);
+    });
+
+    test('400 (Wrong SEQ)', () => {
+      return request(app.getHttpServer()).get(`/content/test`).expect(400);
     });
   });
 
   afterAll(async () => {
-    await tagRepository.remove(testTag1);
-    await tagRepository.remove(testTag2);
-    await tagRepository.remove(testTag3);
-    await tagRepository.remove(testTag4);
-    await contentRepository.remove(contentWith1);
-    await contentRepository.remove(contentWith2);
+    await tagRepository.remove(testTag);
+    await tagRepository.remove(testTagArtist);
+    await contentSourceRepository.remove(contentSource);
+    await contentRepository.remove(content);
+    await contentRepository.remove(contentStatusFalse);
+    await seriesRepository.remove(series);
 
     await app.close();
     await module.close();

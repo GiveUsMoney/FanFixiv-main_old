@@ -172,6 +172,8 @@ describe('ContentController, LikesController (e2e)', () => {
         translateReview: '번역 후기',
         tags: [testTag1],
         artist: testTagArtist,
+        status: true,
+        uploaderSeq: -1,
       }),
     );
 
@@ -184,6 +186,8 @@ describe('ContentController, LikesController (e2e)', () => {
         translateReview: '번역 후기',
         tags: [testTag2],
         artist: testTagArtist,
+        status: true,
+        uploaderSeq: -1,
       }),
     );
 
@@ -196,6 +200,8 @@ describe('ContentController, LikesController (e2e)', () => {
         translateReview: '번역 후기',
         tags: [testTag1, testTag2],
         artist: testTagArtist,
+        status: true,
+        uploaderSeq: -1,
       }),
     );
 
@@ -208,6 +214,8 @@ describe('ContentController, LikesController (e2e)', () => {
         translateReview: '번역 후기',
         tags: [testTag1, testTag2],
         artist: testTagArtist,
+        status: true,
+        uploaderSeq: -1,
       }),
     );
   });
