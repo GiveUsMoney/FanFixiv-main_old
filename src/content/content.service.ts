@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ContentEntity } from '@src/entities/content.entity';
 import { ContentDto } from '@src/dto/content.dto';
@@ -19,6 +19,14 @@ export class ContentService {
 
   private EXTAR_TAGS: TagEntity[] = [];
 
+  private snakeToCamel(str: string) {
+    return str
+      .toLowerCase()
+      .replace(/([-_][a-z])/g, (group) =>
+        group.toUpperCase().replace('-', '').replace('_', ''),
+      );
+  }
+
   async setExtraTags() {
     this.EXTAR_TAGS = await this.tagRepository.find({
       select: ['seq', 'extraTag'],
@@ -26,14 +34,6 @@ export class ContentService {
         type: TagTypes.EXTRA,
       },
     });
-  }
-
-  snakeToCamel(str: string) {
-    return str
-      .toLowerCase()
-      .replace(/([-_][a-z])/g, (group) =>
-        group.toUpperCase().replace('-', '').replace('_', ''),
-      );
   }
 
   /**
@@ -46,7 +46,7 @@ export class ContentService {
    * @param dto.tags 검색할 태그들
    * @return 컨텐츠 목록
    */
-  async getContent(
+  async getContents(
     user: number,
     profile: UserProfile | null,
     dto: ContentDto,
@@ -209,5 +209,67 @@ export class ContentService {
     }, []);
 
     return [result.slice(skip, skip + count), result.length];
+  }
+
+  /**
+   * @param user 사용자 고유번호
+   * @param profile IProfile
+   * @param profile.birth 사용자의 생일
+   * @param seq 컨텐츠 SEQ
+   * @return 컨텐츠 목록
+   */
+  async getContent(
+    user: number,
+    profile: UserProfile | null,
+    seq: number,
+  ): Promise<ContentEntity> {
+    const result = await this.contentRepository
+      .createQueryBuilder('content')
+      .leftJoinAndSelect('content.tags', 'tag')
+      .leftJoinAndSelect('content.source', 'source')
+      .leftJoinAndSelect('content.series', 'series')
+      .leftJoin(
+        (sub) =>
+          sub
+            .subQuery()
+            .select('like.content_seq', 'like_content_seq')
+            .addSelect('COUNT(seq)', 'like')
+            .from(LikesEntity, 'like')
+            .groupBy('like.content_seq'),
+        'like',
+        '"like"."like_content_seq" = content.seq',
+      )
+      .leftJoin(
+        (sub) =>
+          sub
+            .subQuery()
+            .select('like.content_seq', 'like_content_seq')
+            .addSelect('COUNT(seq) > 0', 'do_like')
+            .from(LikesEntity, 'like')
+            .where('like.user_seq = :user', { user })
+            .groupBy('like.content_seq'),
+        'do_like',
+        '"do_like"."like_content_seq" = content.seq',
+      )
+      .addSelect('COALESCE("like"."like", 0)', 'content_like')
+      .addSelect('COALESCE("do_like"."do_like", false)', 'content_do_like')
+      .where('(tag.status or tag.status is null)')
+      .andWhere('(content.status)')
+      .andWhere(
+        `(not content."is_adult" 
+        or (
+          content."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
+        {
+          birth: profile?.birth ?? '3000-01-01',
+        },
+      )
+      .andWhere('content.seq = :seq', { seq })
+      .getOne();
+
+    if (result == null) {
+      throw new BadRequestException('해당 컨텐츠가 존재하지 않습니다.');
+    }
+
+    return result;
   }
 }
