@@ -1,11 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ContentEntity } from '@src/entities/content.entity';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Content } from '@src/interfaces/content.interface';
-import { Exclude, Expose, plainToInstance, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { IsInt, Min } from '@src/common/validator';
 import { TagResultDto } from './tag.dto';
+import { IsOptional } from 'class-validator';
+import { BaseDto } from './base.dto';
 
-export class ContentDto {
+export class ContentDto extends BaseDto {
   @IsInt()
   @Min(1)
   @Transform((x) => parseInt(x.value))
@@ -25,14 +26,25 @@ export class ContentDto {
     default: 1,
   })
   page = 1;
+
+  @IsInt({ each: true })
+  @IsOptional()
+  @Transform((x) => (x.value as string).split(',')?.map((v) => parseInt(v)))
+  @ApiPropertyOptional({
+    description: '검색할 태그 목록',
+    type: String,
+  })
+  tags: number[];
 }
 
 @Exclude()
-export class ContentCardDto implements Content {
-  constructor(content: ContentEntity) {
-    Object.assign(this, content);
-    this.tags = plainToInstance(TagResultDto, content.tags);
-  }
+export class ContentCardDto extends BaseDto implements Content {
+  @Expose()
+  @ApiProperty({
+    type: Number,
+    description: '고유 아이디',
+  })
+  seq: number;
 
   @Expose()
   @ApiProperty({
@@ -57,14 +69,30 @@ export class ContentCardDto implements Content {
 
   @Expose()
   @ApiProperty({
+    type: Boolean,
+    description: '성인용 컨텐츠 여부',
+  })
+  isAdult: boolean;
+
+  @Expose()
+  @ApiProperty({
     type: Number,
     description: '좋아요 개수',
   })
+  @Transform(({ value }) => parseInt(value))
   like: number;
+
+  @Expose()
+  @ApiProperty({
+    type: Boolean,
+    description: '좋아요 여부',
+  })
+  doLike: boolean;
 
   translateReview: string;
 
   @Expose()
+  @Type(() => TagResultDto)
   @ApiProperty({
     type: [TagResultDto],
     description: '태그 목록',
@@ -72,18 +100,14 @@ export class ContentCardDto implements Content {
   tags: TagResultDto[];
 }
 
-export class ContentResultDto {
-  constructor(pageCount: number, content: ContentEntity[]) {
-    this.pageCount = pageCount;
-    this.content = content.map((item) => new ContentCardDto(item));
-  }
-
+export class ContentResultDto extends BaseDto {
   @ApiProperty({
     type: Number,
     description: '총 페이지 개수',
   })
   pageCount: number;
 
+  @Type(() => ContentCardDto)
   @ApiProperty({
     type: [ContentCardDto],
     description: '컨텐츠 카드 목록',

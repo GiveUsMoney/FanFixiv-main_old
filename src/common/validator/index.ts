@@ -3,16 +3,19 @@ import {
   IsInt as _IsInt,
   Min as _Min,
   IsUrl as _IsUrl,
+  ValidationOptions,
 } from 'class-validator';
 
-export const IsString = () =>
+export const IsString = (validationOptions?: ValidationOptions) =>
   _IsString({
     message: '$property가 문자열이 아닙니다.',
+    ...validationOptions,
   });
 
-export const IsInt = () =>
+export const IsInt = (validationOptions?: ValidationOptions) =>
   _IsInt({
     message: '$property가 int형이 아닙니다.',
+    ...validationOptions,
   });
 
 export const Min = (value: number) =>

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
 import { LimitDto, TagDto } from '@src/dto/tag.dto';
 import { Repository } from 'typeorm';
-import { Profile } from '@src/dto/profile.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 
 @Injectable()
 export class TagService {
@@ -20,7 +20,7 @@ export class TagService {
    * @param dto.limit 검색 개수 제한
    * @return 태그 목록
    */
-  findAll(user: Profile, dto: LimitDto): Promise<TagEntity[]> {
+  findAll(user: UserProfile, dto: LimitDto): Promise<TagEntity[]> {
     return this.tagRepository
       .createQueryBuilder('tag')
       .where('tag.status')
@@ -46,7 +46,7 @@ export class TagService {
    * @param dto.limit 검색 개수 제한
    * @return 태그 목록
    */
-  find(user: Profile | null, dto: TagDto): Promise<TagEntity[]> {
+  find(user: UserProfile | null, dto: TagDto): Promise<TagEntity[]> {
     return this.tagRepository
       .createQueryBuilder('tag')
       .innerJoin(TagNameEntity, 'tn', 'tn.type_seq = tag.type::text')

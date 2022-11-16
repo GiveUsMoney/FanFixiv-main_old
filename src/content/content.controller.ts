@@ -1,7 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { Query } from '@nestjs/common/decorators';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Profile, User } from '@src/common/decorator/user.decorator';
 import { ContentDto, ContentResultDto } from '@src/dto/content.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 import { ContentService } from './content.service';
 
 /**
@@ -15,19 +22,22 @@ export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
   @Get()
+  @ApiBearerAuth()
   @ApiQuery({
     type: ContentDto,
   })
   @ApiOkResponse({ type: ContentResultDto })
-  async getContent(@Query() dto: ContentDto): Promise<ContentResultDto> {
-    const items = await this.contentService.getContent(dto);
-    const contents = items.map((item) => {
-      item.like = 99; // <- 더미 좋아요 기능. 후일 삭제 예정
-      return item;
-    });
-    const count = Math.ceil(
-      (await this.contentService.getContentCount()) / dto.count,
+  async getContent(
+    @User() user: number,
+    @Profile() profile: UserProfile | null,
+    @Query() dto: ContentDto,
+  ): Promise<ContentResultDto> {
+    const [content, count] = await this.contentService.getContent(
+      user,
+      profile,
+      dto,
     );
-    return new ContentResultDto(count, contents);
+    const pageCount = Math.ceil(count / dto.count);
+    return new ContentResultDto({ pageCount, content });
   }
 }

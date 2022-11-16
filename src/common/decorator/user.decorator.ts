@@ -1,16 +1,30 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { api } from '../utils/api';
-import { Profile } from '@src/dto/profile.dto';
+import { UserInfo, UserProfile } from '@src/interfaces/user.interface';
+import { config } from 'dotenv';
+
+config({
+  path: `.env.${process.env.NODE_ENV}`,
+});
 
 export const User = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): Promise<Profile | null> => {
+  (_data: unknown, ctx: ExecutionContext): number | null => {
+    const { user } = ctx
+      .switchToHttp()
+      .getRequest<Request & { user: UserInfo }>();
+    return user ? parseInt(user?.sub) : -1;
+  },
+);
+
+export const Profile = createParamDecorator(
+  (_data: unknown, ctx: ExecutionContext): Promise<UserProfile | null> => {
     const { authorization } = ctx.switchToHttp().getRequest<Request>().headers;
 
     if (authorization == null) return null;
 
     if (process.env.NODE_ENV === 'test') {
-      return new Promise<Profile>((res) => {
+      return new Promise<UserProfile>((res) => {
         res({
           email: 'example@example.com',
           nickname: 'test',
@@ -20,12 +34,11 @@ export const User = createParamDecorator(
           nn_md_date: '2022-10-17',
           birth: '2000-01-01',
           _tr: false,
-        } as Profile);
+        } as UserProfile);
       });
     }
 
-    //TODO: 후일 localhost에서 인증서버의 주소로 변경할 것.
-    return api<Profile>('http://localhost:8080/profile', {
+    return api<UserProfile>(process.env.USER_SERVER + '/profile', {
       headers: { authorization },
     }).catch(() => null);
   },

@@ -1,4 +1,4 @@
-export interface Profile {
+export interface UserProfile {
   email: string;
   nickname: string;
   profile_img: string;
@@ -7,4 +7,11 @@ export interface Profile {
   nn_md_date: string;
   birth: string;
   _tr: boolean;
+}
+
+export interface UserInfo {
+  sub: string;
+  roles: string[];
+  iat: number;
+  exp: number;
 }

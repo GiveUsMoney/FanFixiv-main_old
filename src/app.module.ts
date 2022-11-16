@@ -12,6 +12,11 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisConfigService } from './config/redis.config';
 import { RabbitModule } from './rabbitmq/rabbit.module';
 import { ShutDownService } from './common/event/shutdown.event';
+import { LikesModule } from './likes/like.module';
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import { RabbitConfigService } from '@src/config/rabbit.config';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -28,9 +33,13 @@ import { ShutDownService } from './common/event/shutdown.event';
     RedisModule.forRootAsync({
       useClass: RedisConfigService,
     }),
+    RabbitMQModule.forRootAsync(RabbitMQModule, {
+      useClass: RabbitConfigService,
+    }),
     // 이하는 API 모듈 일람
     TagModule,
     ContentModule,
+    LikesModule,
     ProfileImgModule,
     RabbitModule,
   ],
@@ -43,8 +52,13 @@ import { ShutDownService } from './common/event/shutdown.event';
     JwtStrategy,
     // 전역 직렬화 인터셉터 추가. (후일 전역이 아닌 다른 방식으로 교체 예정)
     {
-      provide: 'APP_INTERCEPTOR',
+      provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    // 모든 API에 가드 추가 (Roles 추가가 되지 않으면 그냥 통과됨.)
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
     ShutDownService,
   ],
