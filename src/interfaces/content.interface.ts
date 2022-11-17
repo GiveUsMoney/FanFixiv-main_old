@@ -1,3 +1,4 @@
+import { Likes } from './likes.interface';
 import { Tag } from './tag.interface';
 
 export interface Content {
@@ -7,5 +8,7 @@ export interface Content {
   isAdult: boolean;
   like: number;
   doLike: boolean;
+  artist: Tag;
   tags: Tag[];
+  likes: Likes[];
 }

@@ -1,6 +1,14 @@
 import { Content } from '@src/interfaces/content.interface';
-import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { LikesEntity } from './likes.entity';
 import { TagEntity } from './tag.entity';
 
 @Entity({ name: 'tb_content' })
@@ -25,6 +33,9 @@ export class ContentEntity extends BaseEntity implements Content {
   @Column({ select: false, nullable: true, insert: false, update: false })
   doLike: boolean;
 
+  @ManyToOne(() => TagEntity, (tag) => tag.work)
+  artist: TagEntity;
+
   @ManyToMany(() => TagEntity)
   @JoinTable({
     name: 'tb_content_tag_reg',
@@ -38,4 +49,7 @@ export class ContentEntity extends BaseEntity implements Content {
     },
   })
   tags: TagEntity[];
+
+  @OneToMany(() => LikesEntity, (like) => like.content, { cascade: true })
+  likes: LikesEntity[];
 }

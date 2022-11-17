@@ -1,4 +1,10 @@
-import { Controller, Param, ParseIntPipe, Post } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '@src/common/decorator/roles.decorator';
 import { Profile, User } from '@src/common/decorator/user.decorator';
@@ -13,6 +19,7 @@ export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
   @Post(':content')
+  @HttpCode(200)
   @Roles(Role.USER)
   @ApiBearerAuth()
   async doLike(

@@ -40,6 +40,7 @@ export class TagResultDto extends BaseDto implements Tag {
 
   @Expose()
   @IsEnum(TagTypes)
+  @Transform(({ value }) => (Number.isInteger(value) ? value : parseInt(value)))
   @ApiProperty({
     enum: TagTypes,
     description: '태그 종류',
