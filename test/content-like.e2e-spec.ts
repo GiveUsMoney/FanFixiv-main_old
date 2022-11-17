@@ -427,6 +427,7 @@ describe('ContentController, LikesController (e2e)', () => {
     await contentRepository.remove(contentWith2);
     await contentRepository.remove(contentWith12);
     await contentRepository.remove(contentWith12Adult);
+    await tagRepository.remove(testTagArtist);
 
     await app.close();
     await module.close();

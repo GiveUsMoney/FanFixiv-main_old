@@ -19,12 +19,14 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from '@src/common/guard/jwt-auth.guard';
 import { JwtStrategy } from '@src/common/strategy/jwt.strategy';
 
-describe('ContentController, LikesController (e2e)', () => {
+describe('ContentController (e2e) (Tags)', () => {
   let app: INestApplication;
   let module: TestingModule;
 
   let tagRepository: Repository<TagEntity>;
   let contentRepository: Repository<ContentEntity>;
+
+  let testTagArtist: TagEntity;
 
   let testTag1: TagEntity;
   let testTag2: TagEntity;
@@ -97,6 +99,16 @@ describe('ContentController, LikesController (e2e)', () => {
 
     await app.init();
 
+    testTagArtist = await tagRepository.save(
+      new TagEntity({
+        type: TagTypes.ARTIST,
+        name: '테스트 작가',
+        description: '테스트용 작가입니다.',
+        status: true,
+        isAdult: false,
+      }),
+    );
+
     testTag1 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
@@ -145,6 +157,7 @@ describe('ContentController, LikesController (e2e)', () => {
         isAdult: false,
         translateReview: '번역 후기',
         tags: [testTag1, testTag2, testTag3, testTag4],
+        artist: testTagArtist,
       }),
     );
 
@@ -156,6 +169,7 @@ describe('ContentController, LikesController (e2e)', () => {
         isAdult: false,
         translateReview: '번역 후기',
         tags: [testTag3, testTag4],
+        artist: testTagArtist,
       }),
     );
   });
@@ -194,6 +208,7 @@ describe('ContentController, LikesController (e2e)', () => {
     await tagRepository.remove(testTag4);
     await contentRepository.remove(contentWith1);
     await contentRepository.remove(contentWith2);
+    await tagRepository.remove(testTagArtist);
 
     await app.close();
     await module.close();
