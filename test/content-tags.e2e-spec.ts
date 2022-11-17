@@ -211,6 +211,7 @@ describe('ContentController - Tag (e2e)', () => {
     await tagRepository.remove(testTag4);
     await contentRepository.remove(contentWith1);
     await contentRepository.remove(contentWith2);
+    await tagRepository.remove(testArtistTag);
 
     await app.close();
     await module.close();
