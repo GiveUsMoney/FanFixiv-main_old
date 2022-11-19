@@ -12,21 +12,21 @@ export const TempImageStorage = multerS3({
   contentType: multerS3.AUTO_CONTENT_TYPE,
   key: function (req: Express.Request, file: Express.Multer.File, cb: any) {
     const extName = file.originalname.split('.').pop();
-    if (EXT_LIST.includes(extName)) {
-      cb(null, 'temp/' + Date.now().toString() + '.' + extName);
-    }
+    cb(null, 'temp/' + Date.now().toString() + '.' + extName);
   },
 });
 
 export const fileFilter = (_: Request, file: Express.Multer.File, cb: any) => {
   if (file.mimetype == 'image/png' || file.mimetype == 'image/jpeg') {
-    cb(null, true);
-  } else {
-    cb(
-      new UnsupportedMediaTypeException(
-        '이미지가 아닌 파일은 업로드 할수 없습니다.',
-      ),
-      false,
-    );
+    if (EXT_LIST.includes(file.originalname.split('.').pop())) {
+      cb(null, true);
+      return;
+    }
   }
+  cb(
+    new UnsupportedMediaTypeException(
+      '이미지가 아닌 파일은 업로드 할수 없습니다.',
+    ),
+    false,
+  );
 };
