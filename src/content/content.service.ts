@@ -69,6 +69,7 @@ export class ContentService {
               '"tmp"."count_rank" as "count_rank"',
               '"tmp"."type" as "tag_type"',
               '"tmp"."name" as "tag_name"',
+              '"tmp"."status" as "tag_status"',
             ])
             .from(
               (sub) =>
@@ -77,8 +78,7 @@ export class ContentService {
                   .select('"reg"."content_seq"', 'c_seq')
                   .addSelect(
                     `rank() 
-                    over(partition by reg.content_seq order by tag_count.count desc, tag_count.seq asc)
-                    `,
+                    over(partition by reg.content_seq order by tag_count.count desc, tag_count.seq asc)`,
                     'count_rank',
                   )
                   .from('tb_content_tag_reg', 'reg')
@@ -93,6 +93,7 @@ export class ContentService {
                           'reg',
                           '"reg"."tag_seq" = "tag"."seq"',
                         )
+                        .where(`tag.type <> '0'::tb_tag_type_enum`)
                         .groupBy('"tag"."seq"'),
                     'tag_count',
                     '"tag_count"."seq" = "reg"."tag_seq"',
@@ -103,6 +104,7 @@ export class ContentService {
         'tag',
         '"tag"."c_seq" = "content"."seq"',
       )
+      .leftJoinAndSelect('content.artist', 'artist')
       .leftJoin(
         (sub) =>
           sub
@@ -128,7 +130,8 @@ export class ContentService {
       )
       .addSelect('COALESCE("like"."like", 0)', 'content_like')
       .addSelect('COALESCE("do_like"."do_like", false)', 'content_do_like')
-      .where(
+      .where('(tag.tag_status or tag.tag_status is null)')
+      .andWhere(
         `(not content."is_adult" 
         or (
           content."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
@@ -181,13 +184,20 @@ export class ContentService {
         (o, [k, v]) => {
           if (k.includes('content_')) {
             o[this.snakeToCamel(k.replace('content_', ''))] = v;
+          } else if (k.includes('artist_')) {
+            o.artist[this.snakeToCamel(k.replace('artist_', ''))] = v;
           } else if (k.includes('tag_')) {
             o.tags[0][this.snakeToCamel(k.replace('tag_', ''))] = v;
           }
           return o;
         },
-        { tags: [{}] } as any,
+        { tags: [{}], artist: {} } as any,
       );
+
+      if (r.tags[0].seq == null) {
+        r.tags = [];
+      }
+
       const x = act.find((x) => x.seq == r.seq);
 
       if (x == undefined) {

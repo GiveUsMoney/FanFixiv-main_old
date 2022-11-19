@@ -29,6 +29,8 @@ describe('ContentController, LikesController (e2e)', () => {
   let contentRepository: Repository<ContentEntity>;
   let likesRepository: Repository<LikesEntity>;
 
+  let testTagArtist: TagEntity;
+
   let testTag1: TagEntity;
   let testTag2: TagEntity;
   let testTagPop: TagEntity;
@@ -109,6 +111,16 @@ describe('ContentController, LikesController (e2e)', () => {
 
     await app.init();
 
+    testTagArtist = await tagRepository.save(
+      new TagEntity({
+        type: TagTypes.ARTIST,
+        name: '테스트 작가',
+        description: '테스트용 작가입니다.',
+        status: true,
+        isAdult: false,
+      }),
+    );
+
     testTag1 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
@@ -159,6 +171,7 @@ describe('ContentController, LikesController (e2e)', () => {
         isAdult: false,
         translateReview: '번역 후기',
         tags: [testTag1],
+        artist: testTagArtist,
       }),
     );
 
@@ -170,6 +183,7 @@ describe('ContentController, LikesController (e2e)', () => {
         isAdult: false,
         translateReview: '번역 후기',
         tags: [testTag2],
+        artist: testTagArtist,
       }),
     );
 
@@ -181,6 +195,7 @@ describe('ContentController, LikesController (e2e)', () => {
         isAdult: false,
         translateReview: '번역 후기',
         tags: [testTag1, testTag2],
+        artist: testTagArtist,
       }),
     );
 
@@ -192,6 +207,7 @@ describe('ContentController, LikesController (e2e)', () => {
         isAdult: true,
         translateReview: '번역 후기',
         tags: [testTag1, testTag2],
+        artist: testTagArtist,
       }),
     );
   });
@@ -411,6 +427,7 @@ describe('ContentController, LikesController (e2e)', () => {
     await contentRepository.remove(contentWith2);
     await contentRepository.remove(contentWith12);
     await contentRepository.remove(contentWith12Adult);
+    await tagRepository.remove(testTagArtist);
 
     await app.close();
     await module.close();
