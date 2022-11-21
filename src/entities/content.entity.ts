@@ -30,7 +30,7 @@ export class ContentEntity extends BaseEntity implements Content {
   @Column()
   translateReview: string;
 
-  @Column()
+  @Column({ default: false })
   isAdult: boolean;
 
   @Column()

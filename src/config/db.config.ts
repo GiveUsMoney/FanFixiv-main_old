@@ -5,6 +5,7 @@ import {
   ContentEntity,
   ContentSourceEntity,
 } from '@src/entities/content.entity';
+import { ArtistProfileEntity } from '@src/entities/artist-profile.entity';
 import { LikesEntity } from '@src/entities/likes.entity';
 import { SeriesEntity } from '@src/entities/series.entity';
 import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
@@ -29,8 +30,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         TagNameEntity,
         ContentEntity,
         ContentSourceEntity,
-        LikesEntity,
         SeriesEntity,
+        LikesEntity,
+        ArtistProfileEntity,
       ],
       namingStrategy: new SnakeNamingStrategy(),
     };
