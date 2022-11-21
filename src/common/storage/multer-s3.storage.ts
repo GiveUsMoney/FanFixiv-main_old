@@ -3,8 +3,6 @@ import { AWS_S3_BUCKET_NAME, s3 } from '@src/config/aws.config';
 import { Request } from 'express';
 import * as multerS3 from 'multer-s3';
 
-export const EXT_LIST = ['jpg', 'png'];
-
 export const TempImageStorage = multerS3({
   s3: s3,
   bucket: AWS_S3_BUCKET_NAME,

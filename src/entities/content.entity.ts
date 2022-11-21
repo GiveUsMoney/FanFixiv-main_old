@@ -22,7 +22,7 @@ export class ContentEntity extends BaseEntity implements Content {
   @Column()
   translateReview: string;
 
-  @Column()
+  @Column({ default: false })
   isAdult: boolean;
 
   // typeorm의 .addSelectAndMap 기능이 현재 존재하지 않아 있는 임시 컬럼...
