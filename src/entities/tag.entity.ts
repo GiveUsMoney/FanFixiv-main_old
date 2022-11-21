@@ -9,7 +9,6 @@ export class TagEntity extends BaseEntity implements Tag {
   @Column({
     type: 'enum',
     enum: TagTypes,
-    default: TagTypes.ATTRIBUTE,
   })
   type: TagTypes;
 
