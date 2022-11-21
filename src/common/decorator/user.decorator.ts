@@ -21,10 +21,10 @@ export const Profile = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): Promise<UserProfile | null> => {
     const { authorization } = ctx.switchToHttp().getRequest<Request>().headers;
 
-    if (authorization == null) return null;
+    if (authorization === null) return null;
 
     if (process.env.NODE_ENV === 'test') {
-      if (authorization == 'Bearer ADULT')
+      if (authorization === 'Bearer ADULT')
         return new Promise<UserProfile>((res) => {
           res({
             email: 'example@example.com',
@@ -37,7 +37,7 @@ export const Profile = createParamDecorator(
             _tr: false,
           } as UserProfile);
         });
-      else if (authorization == 'Bearer CHILD')
+      else if (authorization === 'Bearer CHILD')
         return new Promise<UserProfile>((res) => {
           res({
             email: 'example@example.com',

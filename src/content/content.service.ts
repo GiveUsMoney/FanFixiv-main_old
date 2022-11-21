@@ -51,7 +51,7 @@ export class ContentService {
     profile: UserProfile | null,
     dto: ContentDto,
   ): Promise<[ContentEntity[], number]> {
-    if (this.EXTAR_TAGS.length == 0) await this.setExtraTags();
+    if (this.EXTAR_TAGS.length === 0) await this.setExtraTags();
 
     const { count, page } = dto;
     const tags = dto.tags ?? [];
@@ -161,7 +161,7 @@ export class ContentService {
       }
       if (exTags.length != 0) {
         const exTagTypes = exTags.map((idx) => {
-          return this.EXTAR_TAGS.find((x) => x.seq == idx).extraTag;
+          return this.EXTAR_TAGS.find((x) => x.seq === idx).extraTag;
         });
         if (exTagTypes.includes(ExtraTagTypes.POPULARITY)) {
           content = content.andWhere('"like"."like" >= 5');
@@ -194,11 +194,11 @@ export class ContentService {
         { tags: [{}], artist: {} } as any,
       );
 
-      if (r.tags[0].seq == null) {
+      if (r.tags[0].seq === null) {
         r.tags = [];
       }
 
-      const x = act.find((x) => x.seq == r.seq);
+      const x = act.find((x) => x.seq === r.seq);
 
       if (x == undefined) {
         act.push(r);

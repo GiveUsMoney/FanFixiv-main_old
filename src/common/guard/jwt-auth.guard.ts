@@ -35,7 +35,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (err) {
       throw err || new UnauthorizedException();
     }
-    if (process.env.NODE_ENV == 'test') {
+    if (process.env.NODE_ENV === 'test') {
       return {
         sub: 1,
         roles: [Role.USER],

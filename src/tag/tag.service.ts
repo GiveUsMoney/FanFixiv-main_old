@@ -77,7 +77,7 @@ export class TagService {
 
    */
   async insert(user: number, dto: TagRequestDto): Promise<TagEntity> {
-    if (dto.type == TagTypes.ARTIST && dto.profiles == undefined) {
+    if (dto.type === TagTypes.ARTIST && dto.profiles == undefined) {
       throw new BadRequestException(
         '원작자 태그는 원작자 프로필 링크가 필요합니다.',
       );

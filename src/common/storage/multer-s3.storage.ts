@@ -15,7 +15,7 @@ export const TempImageStorage = multerS3({
 });
 
 export const fileFilter = (_: Request, file: Express.Multer.File, cb: any) => {
-  if (file.mimetype == 'image/png' || file.mimetype == 'image/jpeg') {
+  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
     if (EXT_LIST.includes(file.originalname.split('.').pop())) {
       cb(null, true);
       return;
