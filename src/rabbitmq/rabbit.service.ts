@@ -1,13 +1,11 @@
 import { CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { RabbitRPC } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
-import { AWS_S3_BUCKET_NAME, s3 } from '@src/config/aws.config';
+import { AWS_S3_BUCKET_NAME, EXT_LIST, s3 } from '@src/config/aws.config';
 import { ProfileFormDto, ProfileFormResultDto } from '@src/dto/upload.dto';
 
 @Injectable()
 export class RabbitService {
-  private EXT_LIST = ['jpg', 'png'];
-
   @RabbitRPC({
     exchange: 'fanfixiv.main',
     routingKey: 'profile-img.form',
@@ -21,7 +19,7 @@ export class RabbitService {
 
       const [nameCheck, extCheck] = realKey.split('.');
 
-      if (!/[^0-9]/.test(nameCheck) || !this.EXT_LIST.includes(extCheck)) {
+      if (!/[^0-9]/.test(nameCheck) || !EXT_LIST.includes(extCheck)) {
         throw new Error('프로필 이미지 링크가 올바르지 않습니다.');
       }
 

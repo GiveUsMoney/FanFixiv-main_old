@@ -1,5 +1,5 @@
 import { UnsupportedMediaTypeException } from '@nestjs/common';
-import { AWS_S3_BUCKET_NAME, s3 } from '@src/config/aws.config';
+import { AWS_S3_BUCKET_NAME, EXT_LIST, s3 } from '@src/config/aws.config';
 import { Request } from 'express';
 import * as multerS3 from 'multer-s3';
 

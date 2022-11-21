@@ -5,6 +5,8 @@ config({
   path: `.env.${process.env.NODE_ENV}`,
 });
 
+export const EXT_LIST = ['jpg', 'png'];
+
 export const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 
 export const s3 = new S3Client({
