@@ -5,7 +5,7 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
-import { UserInfo } from '@src/dto/user.dto';
+import { UserInfo } from '@src/interfaces/user.interface';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { ActionDto } from '@src/dto/action.dto';
