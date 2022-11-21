@@ -75,7 +75,7 @@ describe('TagController (e2e)', () => {
     testTag = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터',
+        name: '태그 테스트 캐릭터',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -85,7 +85,7 @@ describe('TagController (e2e)', () => {
     testAdultTag = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 (성인)',
+        name: '태그 테스트 캐릭터 (성인)',
         description: '테스트용 캐릭터입니다. (성인)',
         status: true,
         isAdult: true,

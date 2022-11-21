@@ -114,7 +114,7 @@ describe('ContentController, LikesController (e2e)', () => {
     testTagArtist = await tagRepository.save(
       new TagEntity({
         type: TagTypes.ARTIST,
-        name: '테스트 작가',
+        name: '컨텐츠-좋아요 테스트 작가',
         description: '테스트용 작가입니다.',
         status: true,
         isAdult: false,
@@ -124,7 +124,7 @@ describe('ContentController, LikesController (e2e)', () => {
     testTag1 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 1',
+        name: '컨텐츠-좋아요 테스트 캐릭터 1',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -134,7 +134,7 @@ describe('ContentController, LikesController (e2e)', () => {
     testTag2 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 2',
+        name: '컨텐츠-좋아요 테스트 캐릭터 2',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -166,7 +166,7 @@ describe('ContentController, LikesController (e2e)', () => {
     contentWith1 = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '테스트 컨텐츠 1',
+        title: '컨텐츠-좋아요 테스트 컨텐츠 1',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',
@@ -180,7 +180,7 @@ describe('ContentController, LikesController (e2e)', () => {
     contentWith2 = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '테스트 컨텐츠 2',
+        title: '컨텐츠-좋아요 테스트 컨텐츠 2',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',
@@ -194,7 +194,7 @@ describe('ContentController, LikesController (e2e)', () => {
     contentWith12 = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '테스트 컨텐츠 1,2',
+        title: '컨텐츠-좋아요 테스트 컨텐츠 1,2',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',
@@ -208,7 +208,7 @@ describe('ContentController, LikesController (e2e)', () => {
     contentWith12Adult = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '성인 테스트 컨텐츠 1,2',
+        title: '컨텐츠-좋아요 성인 테스트 컨텐츠 1,2',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: true,
         translateReview: '번역 후기',

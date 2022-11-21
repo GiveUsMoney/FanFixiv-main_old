@@ -101,7 +101,7 @@ describe('ContentController - Tag (e2e)', () => {
     testArtistTag = await tagRepository.save(
       new TagEntity({
         type: TagTypes.ARTIST,
-        name: '테스트 작가',
+        name: '컨텐츠-태그 테스트 작가 1',
         description: '테스트용 작가입니다.',
         status: true,
         isAdult: false,
@@ -111,7 +111,7 @@ describe('ContentController - Tag (e2e)', () => {
     testTag1 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 1',
+        name: '컨텐츠-태그 테스트 캐릭터 1',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -121,7 +121,7 @@ describe('ContentController - Tag (e2e)', () => {
     testTag2 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 2',
+        name: '컨텐츠-태그 테스트 캐릭터 2',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -131,7 +131,7 @@ describe('ContentController - Tag (e2e)', () => {
     testTag3 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 3',
+        name: '컨텐츠-태그 테스트 캐릭터 3',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -141,7 +141,7 @@ describe('ContentController - Tag (e2e)', () => {
     testTag4 = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터 4',
+        name: '컨텐츠-태그 테스트 캐릭터 4',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -151,7 +151,7 @@ describe('ContentController - Tag (e2e)', () => {
     contentWith1 = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '테스트 컨텐츠 1',
+        title: '컨텐츠-태그 테스트 컨텐츠 1',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',
@@ -165,7 +165,7 @@ describe('ContentController - Tag (e2e)', () => {
     contentWith2 = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '테스트 컨텐츠 2',
+        title: '컨텐츠-태그 테스트 컨텐츠 2',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',

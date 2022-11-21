@@ -77,24 +77,24 @@ describe('TagController (e2e)', () => {
     beforeAll(async () => {
       charatorTag = new TagRequestDto({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터',
+        name: '태그요청 테스트 캐릭터',
         description: '테스트 캐릭터입니다.',
       });
       artistTag = new TagRequestDto({
         type: TagTypes.ARTIST,
-        name: '테스트 작가',
+        name: '태그요청 테스트 작가 1',
         description: '테스트 작가입니다.',
         profiles: ['http://example.com', 'http://test.com'],
       });
       artistTagWithSameProfile = new TagRequestDto({
         type: TagTypes.ARTIST,
-        name: '테스트 작가 2',
+        name: '태그요청 테스트 작가 2',
         description: '테스트 작가2입니다.',
         profiles: ['http://example.com', 'http://test2.com'],
       });
       artistTagWithoutProfile = new TagRequestDto({
         type: TagTypes.ARTIST,
-        name: '테스트 작가 2',
+        name: '태그요청 테스트 작가 2',
         description: '테스트 작가2 입니다.',
       });
     });
