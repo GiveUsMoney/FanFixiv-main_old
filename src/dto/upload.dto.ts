@@ -1,8 +1,9 @@
 import { FileLocation } from '@src/interfaces/upload.interface';
 import { IsInt, IsString, IsUrl } from '@src/common/validator';
 import { IsOptional } from 'class-validator';
+import { BaseDto } from './base.dto';
 
-export class FileLocationResultDto implements FileLocation {
+export class FileLocationResultDto extends BaseDto implements FileLocation {
   @IsUrl()
   location: string;
 
@@ -10,7 +11,7 @@ export class FileLocationResultDto implements FileLocation {
   key: string;
 }
 
-export class ProfileFormDto {
+export class ProfileFormDto extends BaseDto {
   @IsString()
   key: string;
 
@@ -18,7 +19,7 @@ export class ProfileFormDto {
   auth: string;
 }
 
-export class ProfileFormResultDto {
+export class ProfileFormResultDto extends BaseDto {
   @IsInt()
   status: number;
 

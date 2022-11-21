@@ -4,6 +4,19 @@ export interface Tag {
   description: string;
   status: boolean;
   isAdult: boolean;
+  requester: number;
+}
+
+export interface TagRequest {
+  type: TagTypes;
+  name: string;
+  description: string;
+  isAdult?: boolean;
+  artistProfile?: string[];
+}
+
+export interface ArtistProfile {
+  artistProfile: string;
 }
 
 export enum Language {
@@ -19,4 +32,9 @@ export enum TagTypes {
   ATTRIBUTE,
   LANGUAGE,
   EXTRA,
+}
+
+export enum ExtraTagTypes {
+  POPULARITY,
+  LIKES,
 }

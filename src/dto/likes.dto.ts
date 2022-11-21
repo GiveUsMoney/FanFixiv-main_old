@@ -1,6 +1,5 @@
-export class LikeResultDto {
-  constructor(like: number) {
-    this.like = like;
-  }
+import { BaseDto } from './base.dto';
+
+export class LikeResultDto extends BaseDto {
   like: number;
 }

@@ -1,17 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TagEntity } from '@src/entities/tag.entity';
 import { Tag, TagTypes } from '@src/interfaces/tag.interface';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsInt, IsString } from '@src/common/validator';
 import { IsEnum, IsOptional } from 'class-validator';
+import { BaseDto } from './base.dto';
 
-export class LimitDto {
+export class LimitDto extends BaseDto {
   @IsOptional()
   @IsInt()
   @Transform((x) => parseInt(x.value))
   @ApiProperty({
     type: Number,
     description: '태그 표시 개수',
+    required: false,
   })
   limit: number;
 }
@@ -30,13 +31,17 @@ export class TagDto extends LimitDto {
 }
 
 @Exclude()
-export class TagResultDto implements Tag {
-  constructor(tag: TagEntity) {
-    Object.assign(this, tag);
-  }
+export class TagResultDto extends BaseDto implements Tag {
+  @Expose()
+  @ApiProperty({
+    type: Number,
+    description: '고유 아이디',
+  })
+  seq: number;
 
   @Expose()
   @IsEnum(TagTypes)
+  @Transform(({ value }) => (Number.isInteger(value) ? value : parseInt(value)))
   @ApiProperty({
     enum: TagTypes,
     description: '태그 종류',
@@ -56,10 +61,19 @@ export class TagResultDto implements Tag {
   status: boolean;
 
   isAdult: boolean;
+
+  requester: number;
 }
 
 @Exclude()
 export class TagDescriptionDto extends TagResultDto implements Tag {
+  @Expose()
+  @ApiProperty({
+    type: Number,
+    description: '고유 아이디',
+  })
+  seq: number;
+
   @Expose()
   @IsEnum(TagTypes)
   type: TagTypes;
@@ -79,4 +93,6 @@ export class TagDescriptionDto extends TagResultDto implements Tag {
   status: boolean;
 
   isAdult: boolean;
+
+  requester: number;
 }

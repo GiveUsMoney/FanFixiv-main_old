@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getAge } from '@src/common/utils/birth.utils';
 import { LikeResultDto } from '@src/dto/likes.dto';
-import { UserProfile } from '@src/dto/user.dto';
+import { UserProfile } from '@src/interfaces/user.interface';
 import { ContentEntity } from '@src/entities/content.entity';
 import { LikesEntity } from '@src/entities/likes.entity';
 import { Repository } from 'typeorm';
@@ -41,30 +41,37 @@ export class LikesService {
       );
     }
 
-    const like = await this.likesRepository.findOne({
+    const _like = await this.likesRepository.findOne({
+      relations: ['content'],
       where: {
         userSeq,
-        contentSeq,
+        content: {
+          seq: contentSeq,
+        },
       },
     });
 
-    if (!like) {
+    if (!_like) {
       await this.likesRepository.save(
         new LikesEntity({
           userSeq,
-          contentSeq,
+          content,
         }),
       );
     } else {
-      await this.likesRepository.remove(like);
+      await this.likesRepository.remove(_like);
     }
 
-    const likes = await this.likesRepository.count({
+    const like = await this.likesRepository.count({
+      relations: ['content'],
       where: {
-        contentSeq,
+        userSeq,
+        content: {
+          seq: contentSeq,
+        },
       },
     });
 
-    return new LikeResultDto(likes);
+    return new LikeResultDto({ like });
   }
 }
