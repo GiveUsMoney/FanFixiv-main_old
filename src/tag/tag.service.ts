@@ -20,7 +20,7 @@ export class TagService {
 
   /**
    * 모든 사용중인 태그를 리턴
-   * @param user IProfile
+   * @param user UserProfile
    * @param user.birth 사용자의 생일
    * @param dto LimitDTO
    * @param dto.limit 검색 개수 제한
@@ -45,7 +45,7 @@ export class TagService {
 
   /**
    * 키워드와 일치하는 태그를 찾아서 리턴
-   * @param user IProfile
+   * @param user UserProfile
    * @param user.birth 사용자의 생일
    * @param dto 태그 DTO
    * @param dto.s 검색 키워드
