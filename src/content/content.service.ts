@@ -272,4 +272,66 @@ export class ContentService {
 
     return result;
   }
+
+  /**
+   * @param user 사용자 고유번호
+   * @param profile IProfile
+   * @param profile.birth 사용자의 생일
+   * @param seq 컨텐츠 SEQ
+   * @return 컨텐츠 목록
+   */
+  async getContentView(
+    user: number,
+    profile: UserProfile | null,
+    seq: number,
+  ): Promise<ContentEntity> {
+    const result = await this.contentRepository
+      .createQueryBuilder('content')
+      .leftJoinAndSelect('content.source', 'source')
+      .leftJoinAndSelect('content.series', 'series')
+      .leftJoinAndSelect('content.imgs', 'imgs')
+      .leftJoin(
+        (sub) =>
+          sub
+            .subQuery()
+            .select('like.content_seq', 'like_content_seq')
+            .addSelect('COUNT(seq)', 'like')
+            .from(LikesEntity, 'like')
+            .groupBy('like.content_seq'),
+        'like',
+        '"like"."like_content_seq" = content.seq',
+      )
+      .leftJoin(
+        (sub) =>
+          sub
+            .subQuery()
+            .select('like.content_seq', 'like_content_seq')
+            .addSelect('COUNT(seq) > 0', 'do_like')
+            .from(LikesEntity, 'like')
+            .where('like.user_seq = :user', { user })
+            .groupBy('like.content_seq'),
+        'do_like',
+        '"do_like"."like_content_seq" = content.seq',
+      )
+      .addSelect('COALESCE("like"."like", 0)', 'content_like')
+      .addSelect('COALESCE("do_like"."do_like", false)', 'content_do_like')
+      .where('(content.status)')
+      .andWhere(
+        `(not content."is_adult" 
+        or (
+          content."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
+        {
+          birth: profile?.birth ?? '3000-01-01',
+        },
+      )
+      .andWhere('content.seq = :seq', { seq })
+      .orderBy('imgs.seq', 'ASC')
+      .getOne();
+
+    if (result == null) {
+      throw new BadRequestException('해당 컨텐츠가 존재하지 않습니다.');
+    }
+
+    return result;
+  }
 }

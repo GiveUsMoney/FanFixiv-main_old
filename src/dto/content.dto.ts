@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   Content,
   ContentSource,
+  Image,
   Series,
   SourceType,
 } from '@src/interfaces/content.interface';
@@ -122,6 +123,7 @@ export class ContentCardDto extends BaseDto implements Content {
 
   series: Series;
 }
+
 @Exclude()
 class ContentSourceDto extends BaseDto implements ContentSource {
   @Expose()
@@ -131,6 +133,18 @@ class ContentSourceDto extends BaseDto implements ContentSource {
   })
   type: SourceType;
 
+  @Expose()
+  @ApiProperty({
+    type: String,
+    description: '출처',
+  })
+  link: string;
+
+  content: Content;
+}
+
+@Exclude()
+class ContentImageDto extends BaseDto implements Image {
   @Expose()
   @ApiProperty({
     type: String,
@@ -161,6 +175,20 @@ export class ContentDetailDto extends ContentCardDto {
 
   @Exclude()
   artist: TagResultDto;
+}
+
+@Exclude()
+export class ContentViewDto extends ContentDetailDto {
+  @Expose()
+  @Transform(({ value }) => value.map((x: ContentImageDto) => x.link))
+  @ApiProperty({
+    type: [String],
+    description: '이미지 주소',
+  })
+  imgs: string[];
+
+  @Exclude()
+  tags: TagResultDto[];
 }
 
 export class ContentResultDto extends BaseDto {
