@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ClassSerializerInterceptor, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
-import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
+import { TagEntity } from '@src/entities/tag.entity';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { TagTypes } from '@src/interfaces/tag.interface';
 import { ValidationPipe } from '@nestjs/common/pipes';
@@ -11,18 +11,23 @@ import { TagModule } from '@src/tag/tag.module';
 import { ConfigModule } from '@nestjs/config';
 import { instanceToPlain } from 'class-transformer';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { TagDescriptionDto, TagResultDto } from '@src/dto/tag.dto';
+import { TagDetailDto, TagResultDto } from '@src/dto/tag.dto';
+import { ArtistProfileEntity } from '@src/entities/artist-profile.entity';
 
-describe('TagController (e2e)', () => {
+describe('TagController - list (e2e)', () => {
   let app: INestApplication;
   let module: TestingModule;
 
   let tagRepository: Repository<TagEntity>;
-  let tagNameRepository: Repository<TagNameEntity>;
+  let profileRepository: Repository<ArtistProfileEntity>;
+
+  let testArtistTag: TagEntity;
+
+  let testArtistProfile1: ArtistProfileEntity;
+  let testArtistProfile2: ArtistProfileEntity;
 
   let testTag: TagEntity;
   let testAdultTag: TagEntity;
-  let testTagName: TagNameEntity;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -34,7 +39,7 @@ describe('TagController (e2e)', () => {
         TypeOrmModule.forRootAsync({
           useClass: TypeOrmConfigService,
         }),
-        TypeOrmModule.forFeature([TagNameEntity]),
+        TypeOrmModule.forFeature([ArtistProfileEntity]),
         TagModule,
       ],
       providers: [
@@ -47,35 +52,53 @@ describe('TagController (e2e)', () => {
           useClass: Repository<TagEntity>,
         },
         {
-          provide: getRepositoryToken(TagNameEntity),
-          useClass: Repository<TagNameEntity>,
+          provide: getRepositoryToken(ArtistProfileEntity),
+          useClass: Repository<ArtistProfileEntity>,
         },
       ],
     }).compile();
 
     app = module.createNestApplication();
+
     tagRepository = module.get<Repository<TagEntity>>(
       getRepositoryToken(TagEntity),
     );
-    tagNameRepository = module.get<Repository<TagNameEntity>>(
-      getRepositoryToken(TagNameEntity),
+    profileRepository = module.get<Repository<ArtistProfileEntity>>(
+      getRepositoryToken(ArtistProfileEntity),
     );
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     await app.init();
 
-    testTagName = await tagNameRepository.save(
-      new TagNameEntity({
-        typeSeq: TagTypes.CHARACTOR,
-        typeName: '캐릭터',
+    testArtistTag = await tagRepository.save(
+      new TagEntity({
+        type: TagTypes.ARTIST,
+        name: '태그-리스트 테스트 작가',
+        description: '테스트용 캐릭터입니다.',
+        status: true,
+        isAdult: false,
+      }),
+    );
+
+    testArtistProfile1 = await profileRepository.save(
+      new ArtistProfileEntity({
+        artistProfile: 'www.twitter.com',
+        tag: testArtistTag,
+      }),
+    );
+
+    testArtistProfile2 = await profileRepository.save(
+      new ArtistProfileEntity({
+        artistProfile: 'www.pixiv.com',
+        tag: testArtistTag,
       }),
     );
 
     testTag = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '태그 테스트 캐릭터',
+        name: '태그-리스트 테스트 캐릭터',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -85,7 +108,7 @@ describe('TagController (e2e)', () => {
     testAdultTag = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '태그 테스트 캐릭터 (성인)',
+        name: '태그-리스트 테스트 캐릭터 (성인)',
         description: '테스트용 캐릭터입니다. (성인)',
         status: true,
         isAdult: true,
@@ -93,93 +116,103 @@ describe('TagController (e2e)', () => {
     );
   });
 
-  describe('/tag/all (GET)', () => {
-    let tags: any[];
+  describe('/tag/list (GET)', () => {
     let normalResult: Record<string, any>;
     let adultResult: Record<string, any>;
+    let artistResult: Record<string, any>;
 
     beforeAll(async () => {
-      tags = [testTag];
-      normalResult = instanceToPlain(
-        tags.map((item) => new TagDescriptionDto(item)),
-      );
-
-      tags = [testTag, testAdultTag];
-      adultResult = instanceToPlain(
-        tags.map((item) => new TagDescriptionDto(item)),
-      );
+      normalResult = instanceToPlain([new TagResultDto(testTag)]);
+      adultResult = instanceToPlain([
+        new TagResultDto(testTag),
+        new TagResultDto(testAdultTag),
+      ]);
+      artistResult = instanceToPlain([new TagResultDto(testArtistTag)]);
     });
 
     test('200', () => {
       return request(app.getHttpServer())
-        .get(`/tag/all?limit=${5}`)
+        .get(`/tag/list?limit=5&type=CHARACTOR`)
         .expect(200)
         .expect(normalResult);
     });
 
     test('200 (adult)', () => {
       return request(app.getHttpServer())
-        .get(`/tag/all?limit=${5}`)
+        .get(`/tag/list?limit=5&type=CHARACTOR`)
         .set('Authorization', 'Bearer ADULT')
         .expect(200)
         .expect(adultResult);
+    });
+
+    test('200 (artist profile)', () => {
+      return request(app.getHttpServer())
+        .get(`/tag/list?limit=5&type=ARTIST`)
+        .expect(200)
+        .expect(artistResult);
     });
 
     test('400', () => {
-      return request(app.getHttpServer())
-        .get(`/tag/all?limit=test`)
-        .expect(400);
+      return request(app.getHttpServer()).get(`/tag/list`).expect(400);
     });
   });
 
-  describe('/tag (GET)', () => {
-    const limit = 5;
-    const _s = '테스트 캐릭터';
-    const s = encodeURIComponent(_s);
-    let tags: any[];
+  describe('/tag/detail/:seq (GET)', () => {
+    let tagSeq: number;
+    let tagAdultSeq: number;
+    let tagArtistSeq: number;
+
     let normalResult: Record<string, any>;
     let adultResult: Record<string, any>;
+    let artistResult: Record<string, any>;
 
     beforeAll(async () => {
-      tags = [testTag];
-      normalResult = instanceToPlain(
-        tags.map((item) => new TagResultDto(item)),
-      );
+      tagSeq = testTag.seq;
+      tagAdultSeq = testAdultTag.seq;
+      tagArtistSeq = testArtistTag.seq;
 
-      tags = [testTag, testAdultTag];
-      adultResult = instanceToPlain(tags.map((item) => new TagResultDto(item)));
+      normalResult = instanceToPlain(new TagDetailDto(testTag));
+      normalResult.profiles = [];
+      adultResult = instanceToPlain(new TagDetailDto(testAdultTag));
+      adultResult.profiles = [];
+      artistResult = instanceToPlain(new TagDetailDto(testArtistTag));
+      artistResult.profiles = ['www.twitter.com', 'www.pixiv.com'];
     });
 
     test('200', () => {
       return request(app.getHttpServer())
-        .get(`/tag?s=${s}&limit=${limit}`)
+        .get(`/tag/detail/${tagSeq}`)
         .expect(200)
         .expect(normalResult);
     });
 
     test('200 (adult)', () => {
       return request(app.getHttpServer())
-        .get(`/tag?s=${s}&limit=${limit}`)
+        .get(`/tag/detail/${tagAdultSeq}`)
         .set('Authorization', 'Bearer ADULT')
         .expect(200)
         .expect(adultResult);
     });
 
-    test('400 (limit type wrong)', () => {
+    test('200 (artist profile)', () => {
       return request(app.getHttpServer())
-        .get(`/tag?s=${s}&limit=test`)
-        .expect(400);
+        .get(`/tag/detail/${tagArtistSeq}`)
+        .expect(200)
+        .expect(artistResult);
     });
 
-    test('400 (s missing)', () => {
-      return request(app.getHttpServer()).get(`/tag?limit=test`).expect(400);
+    test('400', () => {
+      return request(app.getHttpServer()).get(`/tag/detail/test`).expect(400);
     });
   });
 
   afterAll(async () => {
+    await profileRepository.remove(testArtistProfile1);
+    await profileRepository.remove(testArtistProfile2);
+
+    await tagRepository.remove(testArtistTag);
     await tagRepository.remove(testTag);
     await tagRepository.remove(testAdultTag);
-    await tagNameRepository.remove(testTagName);
 
     await app.close();
     await module.close();

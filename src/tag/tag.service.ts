@@ -81,7 +81,7 @@ export class TagService {
   findDetail(user: UserProfile | null, seq: number): Promise<TagEntity> {
     return this.tagRepository
       .createQueryBuilder('tag')
-      .leftJoinAndSelect('tag.profiles', 'profiles')
+      .leftJoinAndSelect('tag.profiles', 'profile')
       .where('tag.status')
       .andWhere(
         `(not tag."is_adult" 
@@ -92,6 +92,7 @@ export class TagService {
         },
       )
       .andWhere('tag.seq = :seq', { seq })
+      .orderBy('profile.seq', 'ASC')
       .getOne();
   }
 
