@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TagEntity, TagNameEntity } from '@src/entities/tag.entity';
-import { LimitDto, TagDto } from '@src/dto/tag.dto';
+import { LimitDto, TagDto, TagListDto } from '@src/dto/tag.dto';
 import { DataSource, Repository } from 'typeorm';
 import { UserProfile } from '@src/interfaces/user.interface';
 import { TagRequestDto } from '@src/dto/tag-request.dto';
-import { TagTypes } from '@src/interfaces/tag.interface';
+import { TagSearchTypes, TagTypes } from '@src/interfaces/tag.interface';
 import { ArtistProfileEntity } from '@src/entities/artist-profile.entity';
 
 @Injectable()
@@ -14,8 +14,6 @@ export class TagService {
     private dataSource: DataSource,
     @InjectRepository(TagEntity)
     private tagRepository: Repository<TagEntity>,
-    @InjectRepository(ArtistProfileEntity)
-    private artistProfileRepository: Repository<ArtistProfileEntity>,
   ) {}
 
   /**
@@ -31,9 +29,9 @@ export class TagService {
       .createQueryBuilder('tag')
       .where('tag.status')
       .andWhere(
-        `not tag."is_adult" 
+        `(not tag."is_adult" 
         or (
-          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18) `,
+          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
         {
           birth: user?.birth ?? '3000-01-01',
         },
@@ -58,9 +56,9 @@ export class TagService {
       .innerJoin(TagNameEntity, 'tn', 'tn.type_seq = tag.type::text')
       .where('tag.status')
       .andWhere(
-        `not tag."is_adult" 
+        `(not tag."is_adult" 
         or (
-          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18)`,
+          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
         {
           birth: user?.birth ?? '3000-01-01',
         },
@@ -71,6 +69,82 @@ export class TagService {
       .orderBy('tag.name', 'ASC')
       .limit(dto.limit)
       .getMany();
+  }
+
+  /**
+   * 태그의 상세 정보를 리턴
+   * @param user IProfile
+   * @param user.birth 사용자의 생일
+   * @param seq 태그 고유 번호
+   * @return 태그 상세
+   */
+  findDetail(user: UserProfile | null, seq: number): Promise<TagEntity> {
+    return this.tagRepository
+      .createQueryBuilder('tag')
+      .leftJoinAndSelect('tag.profiles', 'profiles')
+      .where('tag.status')
+      .andWhere(
+        `(not tag."is_adult" 
+        or (
+          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
+        {
+          birth: user?.birth ?? '3000-01-01',
+        },
+      )
+      .andWhere('tag.seq = :seq', { seq })
+      .getOne();
+  }
+
+  /**
+   * 키워드와 일치하는 태그를 찾아서 리턴
+   * @param user IProfile
+   * @param user.birth 사용자의 생일
+   * @param dto 태그 고유 번호
+   * @param dto.type 태그 종류
+   * @param dto.stype 검색 유형
+   * @param dto.s 검색 키워드
+   * @param dto.limit 검색 개수 제한
+   * @return 태그 상세
+   */
+  findList(user: UserProfile, dto: TagListDto) {
+    if (dto.type !== TagTypes.ARTIST && dto.stype === TagSearchTypes.PROFILE)
+      throw new BadRequestException(
+        '해당 태그에는 프로필 검색을 할수 없습니다.',
+      );
+
+    let result = this.tagRepository
+      .createQueryBuilder('tag')
+      .leftJoinAndSelect('tag.profiles', 'profile')
+      .where('tag.status')
+      .andWhere(
+        `(not tag."is_adult" 
+        or (
+          tag."is_adult" and EXTRACT( year FROM age(CURRENT_DATE, :birth)) >= 18))`,
+        {
+          birth: user?.birth ?? '3000-01-01',
+        },
+      )
+      .andWhere('tag.type = :type', { type: dto.type });
+
+    switch (dto.stype) {
+      case TagSearchTypes.NAME:
+        result = result.andWhere('tag.name LIKE :search', {
+          search: `%${dto.s}%`,
+        });
+        break;
+      case TagSearchTypes.PROFILE:
+        result = result.andWhere('profile.artistProfile LIKE :search', {
+          search: `%${dto.s}%`,
+        });
+        break;
+      case TagSearchTypes.DESCRIPTION:
+        result = result.andWhere('tag.description LIKE :search', {
+          search: `%${dto.s}%`,
+        });
+        break;
+    }
+
+    return result.orderBy('tag.name', 'ASC').limit(dto.limit).getMany();
   }
 
   /**

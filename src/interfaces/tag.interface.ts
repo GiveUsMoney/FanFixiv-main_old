@@ -5,6 +5,7 @@ export interface Tag {
   status: boolean;
   isAdult: boolean;
   requester: number;
+  profiles?: ArtistProfile[];
 }
 
 export interface TagRequest {
@@ -32,6 +33,12 @@ export enum TagTypes {
   ATTRIBUTE,
   LANGUAGE,
   EXTRA,
+}
+
+export enum TagSearchTypes {
+  NAME,
+  PROFILE,
+  DESCRIPTION,
 }
 
 export enum ExtraTagTypes {
