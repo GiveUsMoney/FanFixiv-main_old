@@ -160,7 +160,7 @@ export class ContentDetailDto extends ContentCardDto {
   @Expose()
   @Type(() => ContentSourceDto)
   @ApiProperty({
-    type: ContentSourceDto,
+    type: [ContentSourceDto],
     description: '원작/번역 출처',
   })
   source: ContentSourceDto[];

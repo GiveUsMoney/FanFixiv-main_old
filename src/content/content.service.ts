@@ -38,7 +38,7 @@ export class ContentService {
 
   /**
    * @param user 사용자 고유번호
-   * @param profile IProfile
+   * @param profile UserProfile
    * @param profile.birth 사용자의 생일
    * @param dto 컨텐츠 DTO
    * @param dto.count 출력할 컨텐츠 수
@@ -131,6 +131,7 @@ export class ContentService {
       .addSelect('COALESCE("like"."like", 0)', 'content_like')
       .addSelect('COALESCE("do_like"."do_like", false)', 'content_do_like')
       .where('(tag.tag_status or tag.tag_status is null)')
+      .andWhere('(content.status)')
       .andWhere(
         `(not content."is_adult" 
         or (
@@ -213,7 +214,7 @@ export class ContentService {
 
   /**
    * @param user 사용자 고유번호
-   * @param profile IProfile
+   * @param profile UserProfile
    * @param profile.birth 사용자의 생일
    * @param seq 컨텐츠 SEQ
    * @return 컨텐츠 목록
@@ -275,7 +276,7 @@ export class ContentService {
 
   /**
    * @param user 사용자 고유번호
-   * @param profile IProfile
+   * @param profile UserProfile
    * @param profile.birth 사용자의 생일
    * @param seq 컨텐츠 SEQ
    * @return 컨텐츠 목록

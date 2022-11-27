@@ -17,6 +17,7 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { RabbitConfigService } from '@src/config/rabbit.config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { SeriesModule } from './series/series.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
     ContentModule,
     LikesModule,
     ProfileImgModule,
+    SeriesModule,
     RabbitModule,
   ],
   // 후일 삭제 바람.
