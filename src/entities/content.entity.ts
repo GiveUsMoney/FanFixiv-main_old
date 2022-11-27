@@ -2,6 +2,7 @@ import {
   Content,
   ContentSource,
   SourceType,
+  Image,
 } from '@src/interfaces/content.interface';
 import {
   Entity,
@@ -71,6 +72,9 @@ export class ContentEntity extends BaseEntity implements Content {
     cascade: true,
   })
   source: ContentSourceEntity[];
+
+  @OneToMany(() => ContentImageEntity, (img) => img.content)
+  imgs: ContentImageEntity[];
 }
 
 @Entity({ name: 'tb_content_source' })
@@ -85,5 +89,14 @@ export class ContentSourceEntity extends BaseEntity implements ContentSource {
   link: string;
 
   @ManyToOne(() => ContentEntity, (content) => content.source)
+  content: ContentEntity;
+}
+
+@Entity({ name: 'tb_img' })
+export class ContentImageEntity extends BaseEntity implements Image {
+  @Column()
+  link: string;
+
+  @ManyToOne(() => ContentEntity, (content) => content.imgs)
   content: ContentEntity;
 }

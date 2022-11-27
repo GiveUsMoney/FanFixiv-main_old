@@ -22,6 +22,11 @@ export interface ContentSource {
   content: Content;
 }
 
+export interface Image {
+  link: string;
+  content: Content;
+}
+
 export interface Series {
   title: string;
   content: Content[];

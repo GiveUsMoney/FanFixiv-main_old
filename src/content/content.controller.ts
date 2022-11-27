@@ -8,10 +8,10 @@ import {
 } from '@nestjs/swagger';
 import { Profile, User } from '@src/common/decorator/user.decorator';
 import {
-  ContentCardDto,
   ContentDetailDto,
   ContentDto,
   ContentResultDto,
+  ContentViewDto,
 } from '@src/dto/content.dto';
 import { UserProfile } from '@src/interfaces/user.interface';
 import { ContentService } from './content.service';
@@ -21,6 +21,7 @@ import { ContentService } from './content.service';
  *
  * - GET /content
  * - GET /content/:seq
+ * - GET /content/view/:seq
  */
 @ApiTags('content')
 @Controller('content')
@@ -49,7 +50,7 @@ export class ContentController {
 
   @Get(':seq')
   @ApiBearerAuth()
-  @ApiOkResponse({ type: ContentCardDto })
+  @ApiOkResponse({ type: ContentDetailDto })
   async getContent(
     @User() user: number,
     @Profile() profile: UserProfile | null,
@@ -57,5 +58,21 @@ export class ContentController {
   ): Promise<ContentDetailDto> {
     const content = await this.contentService.getContent(user, profile, seq);
     return new ContentDetailDto(content);
+  }
+
+  @Get('view/:seq')
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: ContentViewDto })
+  async getContentView(
+    @User() user: number,
+    @Profile() profile: UserProfile | null,
+    @Param('seq', ParseIntPipe) seq: number,
+  ): Promise<ContentViewDto> {
+    const content = await this.contentService.getContentView(
+      user,
+      profile,
+      seq,
+    );
+    return new ContentViewDto(content);
   }
 }

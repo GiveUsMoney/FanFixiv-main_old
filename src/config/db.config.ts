@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import {
   ContentEntity,
+  ContentImageEntity,
   ContentSourceEntity,
 } from '@src/entities/content.entity';
 import { ArtistProfileEntity } from '@src/entities/artist-profile.entity';
@@ -30,6 +31,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         TagNameEntity,
         ContentEntity,
         ContentSourceEntity,
+        ContentImageEntity,
         SeriesEntity,
         LikesEntity,
         ArtistProfileEntity,
