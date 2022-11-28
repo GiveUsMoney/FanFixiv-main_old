@@ -13,11 +13,10 @@ import { RedisConfigService } from './config/redis.config';
 import { RabbitModule } from './rabbitmq/rabbit.module';
 import { ShutDownService } from './common/event/shutdown.event';
 import { LikesModule } from './likes/like.module';
-import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
-import { RabbitConfigService } from '@src/config/rabbit.config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
 import { SeriesModule } from './series/series.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -34,9 +33,6 @@ import { SeriesModule } from './series/series.module';
     RedisModule.forRootAsync({
       useClass: RedisConfigService,
     }),
-    RabbitMQModule.forRootAsync(RabbitMQModule, {
-      useClass: RabbitConfigService,
-    }),
     // 이하는 API 모듈 일람
     TagModule,
     ContentModule,
@@ -44,6 +40,7 @@ import { SeriesModule } from './series/series.module';
     ProfileImgModule,
     SeriesModule,
     RabbitModule,
+    ReportModule,
   ],
   // 후일 삭제 바람.
   controllers: [AppController],
