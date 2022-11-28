@@ -11,7 +11,6 @@ import {
   ContentReportType,
   ReportType,
 } from '@src/interfaces/report.interface';
-import { JwtStrategy } from '@src/common/strategy/jwt.strategy';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 describe('ReportController (e2e)', () => {
@@ -22,7 +21,6 @@ describe('ReportController (e2e)', () => {
     module = await Test.createTestingModule({
       controllers: [ReportController],
       providers: [
-        JwtStrategy,
         {
           provide: APP_INTERCEPTOR,
           useClass: ClassSerializerInterceptor,
