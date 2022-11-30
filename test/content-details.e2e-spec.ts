@@ -116,7 +116,7 @@ describe('ContentController - details (e2e)', () => {
     testTagArtist = await tagRepository.save(
       new TagEntity({
         type: TagTypes.ARTIST,
-        name: '테스트 작가',
+        name: '컨텐츠-디테일 테스트 작가',
         description: '테스트용 작가입니다.',
         status: true,
         isAdult: false,
@@ -126,7 +126,7 @@ describe('ContentController - details (e2e)', () => {
     testTag = await tagRepository.save(
       new TagEntity({
         type: TagTypes.CHARACTOR,
-        name: '테스트 캐릭터',
+        name: '컨텐츠-디테일 테스트 캐릭터',
         description: '테스트용 캐릭터입니다.',
         status: true,
         isAdult: false,
@@ -135,7 +135,7 @@ describe('ContentController - details (e2e)', () => {
 
     series = await seriesRepository.save(
       new SeriesEntity({
-        title: '테스트 시리즈',
+        title: '컨텐츠-디테일 테스트 시리즈',
       }),
     );
 
@@ -149,7 +149,7 @@ describe('ContentController - details (e2e)', () => {
     contentStatusFalse = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '테스트 컨텐츠 2',
+        title: '컨텐츠-디테일 테스트 컨텐츠 2',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',
@@ -164,7 +164,7 @@ describe('ContentController - details (e2e)', () => {
     content = await contentRepository.save(
       new ContentEntity({
         createdAt: new Date(),
-        title: '테스트 컨텐츠 1',
+        title: '컨텐츠-디테일 테스트 컨텐츠 1',
         thumbnail: 'http://example.com/image.jpg',
         isAdult: false,
         translateReview: '번역 후기',

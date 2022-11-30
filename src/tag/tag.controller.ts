@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -11,7 +19,9 @@ import { UserProfile } from '@src/interfaces/user.interface';
 import {
   LimitDto,
   TagDescriptionDto,
+  TagDetailDto,
   TagDto,
+  TagListDto,
   TagResultDto,
 } from '@src/dto/tag.dto';
 import { TagService } from './tag.service';
@@ -43,6 +53,35 @@ export class TagController {
     @Query() dto: TagDto,
   ): Promise<TagResultDto[]> {
     const items = await this.tagService.find(user, dto);
+    return items.map((item) => new TagResultDto(item));
+  }
+
+  @Get('detail/:seq')
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    type: TagDetailDto,
+  })
+  async getTagDetail(
+    @Profile() user: UserProfile | null,
+    @Param('seq', ParseIntPipe) seq: number,
+  ): Promise<TagDetailDto> {
+    const item = await this.tagService.findDetail(user, seq);
+    return new TagDetailDto(item);
+  }
+
+  @Get('list')
+  @ApiBearerAuth()
+  @ApiQuery({
+    type: TagListDto,
+  })
+  @ApiOkResponse({
+    type: [TagResultDto],
+  })
+  async getTagList(
+    @Profile() user: UserProfile | null,
+    @Query() dto: TagListDto,
+  ): Promise<TagResultDto[]> {
+    const items = await this.tagService.findList(user, dto);
     return items.map((item) => new TagResultDto(item));
   }
 
