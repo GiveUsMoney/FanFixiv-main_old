@@ -5,6 +5,8 @@ import {
   IsUrl as _IsUrl,
   IsEnum as _IsEnum,
   IsBoolean as _IsBoolean,
+  IsEmpty as _IsEmpty,
+  Equals as _Equals,
   ValidationOptions,
 } from 'class-validator';
 import ValidatorJS from 'validator';
@@ -44,5 +46,20 @@ export const IsUrl = (
 export const IsEnum = (entity: object, validationOptions?: ValidationOptions) =>
   _IsEnum(entity, {
     message: `$property가 ENUM에 해당하지 않습니다.`,
+    ...validationOptions,
+  });
+
+export const IsEmpty = (validationOptions?: ValidationOptions) =>
+  _IsEmpty({
+    message: `$property는 공란이어야 합니다.`,
+    ...validationOptions,
+  });
+
+export const Equals = (
+  comparison: any,
+  validationOptions?: ValidationOptions,
+) =>
+  _Equals(comparison, {
+    message: `$property는 특정한 값과 동일해야 합니다.`,
     ...validationOptions,
   });

@@ -105,6 +105,7 @@ export class TagController {
   @Roles(Role.USER)
   @ApiBearerAuth()
   @ApiBody({ type: TagRequestDto })
+  @ApiOkResponse({ type: TagDescriptionDto })
   async tagRequest(
     @User() user: number,
     @Body() dto: TagRequestDto,
