@@ -6,10 +6,7 @@ name: Test:e2e
 on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   pull_request:
-    branches: [ "develop" ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    branches: ['develop', 'master']
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -17,14 +14,76 @@ jobs:
   test:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: fanfixiv
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_PORT: 5432
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3.8
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+        ports:
+          - 5672:5672
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
+
       # Runs a single command using the runners shell
       - name: run the e2e test
         run: |
           npm ci
           npm run test:e2e
+        env:
+          SECRET: ${{ secrets.SECRET }}
+          AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PW: postgres
+          DB_NAME: fanfixiv
+          MQ_URI: amqp://guest:guest@localhost:5672
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+  lint:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      # Runs a single command using the runners shell
+      - name: run the lint
+        run: |
+          npm ci
+          npm run lint
+          npm run format
+      - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version.
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          message: 'chore: format and linter'
